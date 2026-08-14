@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Pharmacy Dashboard</title>
+
+    <style>
+
+        body{
+            margin:0;
+            padding:20px;
+            background:#f5f5f5;
+            font-family:Arial;
+        }
+
+        h1{
+            text-align:center;
+        }
+
+        .grid{
+
+            display:grid;
+
+            grid-template-columns:repeat(2,1fr);
+
+            gap:20px;
+        }
+
+        .card{
+
+            background:white;
+
+            padding:15px;
+
+            border-radius:10px;
+
+            box-shadow:0 2px 8px rgba(0,0,0,.15);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>Pharmacy Sales Dashboard</h1>
+
+<div class="grid">
+
+<div class="card">
+{{ monthly_chart|safe }}
+</div>
+
+<div class="card">
+{{ daily_chart|safe }}
+</div>
+
+<div class="card">
+{{ weekly_chart|safe }}
+</div>
+
+<div class="card">
+{{ yearly_chart|safe }}
+</div>
+
+<div class="card">
+{{ medicine_chart|safe }}
+</div>
+
+<div class="card">
+{{ category_chart|safe }}
+</div>
+
+<div class="card">
+{{ company_chart|safe }}
+</div>
+
+<div class="card">
+{{ low_stock_chart|safe }}
+</div>
+
+<div class="card">
+{{ stock_chart|safe }}
+</div>
+
+</div>
+
+</body>
+
+</html>

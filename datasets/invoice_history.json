@@ -1,0 +1,186 @@
+[
+  {
+    "invoice_no": "INV-2026-1006",
+    "date": "2026-08-15 00:08:49",
+    "customer_name": "Test Customer",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Cash",
+    "items": [
+      {
+        "medicine": "Azithromycin 500",
+        "category": "Antibiotic",
+        "company": "Sun Pharma",
+        "batch": "B2424",
+        "qty": 2,
+        "unit_price": 135.97,
+        "line_total": 271.94,
+        "previous_stock": 346,
+        "remaining_stock": 344
+      }
+    ],
+    "subtotal": 271.94,
+    "discount_pct": 10.0,
+    "discount_amount": 27.19,
+    "tax_amount": 29.37,
+    "grand_total": 274.12
+  },
+  {
+    "invoice_no": "INV-2026-1005",
+    "date": "2026-08-15 00:08:21",
+    "customer_name": "Test Customer",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Cash",
+    "items": [
+      {
+        "medicine": "Azithromycin 500",
+        "category": "Antibiotic",
+        "company": "Sun Pharma",
+        "batch": "B2424",
+        "qty": 2,
+        "unit_price": 135.97,
+        "line_total": 271.94,
+        "previous_stock": 346,
+        "remaining_stock": 344
+      }
+    ],
+    "subtotal": 271.94,
+    "discount_pct": 10.0,
+    "discount_amount": 27.19,
+    "tax_amount": 29.37,
+    "grand_total": 274.12
+  },
+  {
+    "invoice_no": "INV-2026-1004",
+    "date": "2026-08-15 00:08:11",
+    "customer_name": "Test Customer",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Cash",
+    "items": [
+      {
+        "medicine": "Azithromycin 500",
+        "category": "Antibiotic",
+        "company": "Sun Pharma",
+        "batch": "B2424",
+        "qty": 2,
+        "unit_price": 135.97,
+        "line_total": 271.94,
+        "previous_stock": 346,
+        "remaining_stock": 344
+      }
+    ],
+    "subtotal": 271.94,
+    "discount_pct": 10.0,
+    "discount_amount": 27.19,
+    "tax_amount": 29.37,
+    "grand_total": 274.12
+  },
+  {
+    "invoice_no": "INV-2026-1003",
+    "date": "2026-08-15 00:07:44",
+    "customer_name": "Test Customer",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Cash",
+    "items": [
+      {
+        "medicine": "Azithromycin 500",
+        "category": "Antibiotic",
+        "company": "Sun Pharma",
+        "batch": "B2424",
+        "qty": 2,
+        "unit_price": 135.97,
+        "line_total": 271.94,
+        "previous_stock": 346,
+        "remaining_stock": 344
+      }
+    ],
+    "subtotal": 271.94,
+    "discount_pct": 10.0,
+    "discount_amount": 27.19,
+    "tax_amount": 29.37,
+    "grand_total": 274.12
+  },
+  {
+    "invoice_no": "INV-2026-1001",
+    "date": "2026-07-28 14:30:00",
+    "customer_name": "Vikram Sethi",
+    "customer_phone": "9811223344",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "UPI",
+    "items": [
+      {
+        "medicine": "Azithromycin 500",
+        "category": "Antibiotic",
+        "company": "Sun Pharma",
+        "batch": "B2424",
+        "qty": 2,
+        "unit_price": 135.97,
+        "line_total": 271.94,
+        "previous_stock": 346,
+        "remaining_stock": 344
+      },
+      {
+        "medicine": "Crocin",
+        "category": "Painkiller",
+        "company": "Glenmark",
+        "batch": "B5422",
+        "qty": 5,
+        "unit_price": 122.5,
+        "line_total": 612.5,
+        "previous_stock": 236,
+        "remaining_stock": 231
+      }
+    ],
+    "subtotal": 884.44,
+    "discount_pct": 5.0,
+    "discount_amount": 44.22,
+    "tax_amount": 100.83,
+    "grand_total": 941.05
+  },
+  {
+    "invoice_no": "INV-2026-1002",
+    "date": "2026-07-29 09:15:00",
+    "customer_name": "Priya Sharma",
+    "customer_phone": "9876543210",
+    "billed_by": "Rajesh Kumar",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Cash",
+    "items": [
+      {
+        "medicine": "Telmisartan",
+        "category": "Heart",
+        "company": "Sun Pharma",
+        "batch": "B4257",
+        "qty": 3,
+        "unit_price": 60.1,
+        "line_total": 180.3,
+        "previous_stock": 13,
+        "remaining_stock": 10
+      },
+      {
+        "medicine": "Vitamin D3",
+        "category": "Vitamin",
+        "company": "Mankind",
+        "batch": "B6881",
+        "qty": 1,
+        "unit_price": 546.75,
+        "line_total": 546.75,
+        "previous_stock": 194,
+        "remaining_stock": 193
+      }
+    ],
+    "subtotal": 727.05,
+    "discount_pct": 0.0,
+    "discount_amount": 0.0,
+    "tax_amount": 87.25,
+    "grand_total": 814.3
+  }
+]
