@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharmora – Intelligent Pharmacy Growth Partner | POS, Inventory & AI Analytics</title>
+  <meta name="description" content="All-in-one pharmacy management platform with POS billing, inventory control, AI forecasting, analytics & more — built to grow your pharmacy business.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/pharmora_logo.png') }}">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Landing Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+
+<body id="top">
+
+  <!-- =========================================================================
+       1. STICKY HEADER & NAVIGATION
+       ========================================================================= -->
+  <header class="landing-header" id="landing-header">
+    <div class="header-inner">
+      
+      <!-- Brand Logo Left -->
+      <a href="/" class="header-brand" title="Pharmora – Intelligent Pharmacy Growth Partner">
+        <img src="{{ url_for('static', filename='images/pharmora_logo.png') }}" alt="Pharmora Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <span class="brand-title">PHARMORA</span>
+          <span class="brand-subtitle">A Pharmacy Intelligent Growth Partner</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="/" class="nav-link active">Home</a></li>
+          <li><a href="#features" class="nav-link">Features</a></li>
+          
+          <!-- Solutions Dropdown -->
+          <li class="nav-dropdown-item">
+            <button class="nav-link dropdown-toggle" id="solutions-dropdown-btn" aria-expanded="false" aria-haspopup="true">
+              Solutions <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+            </button>
+            <div class="dropdown-menu" id="solutions-dropdown-menu">
+              <a href="/pos" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(34, 197, 94, 0.15); color: #22C55E;">
+                  <i class="fa-solid fa-cash-register"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">POS Billing</span>
+                  <span class="dropdown-desc">Speed checkout & stock deduction</span>
+                </div>
+              </a>
+              <a href="/stock" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(6, 182, 212, 0.15); color: #06B6D4;">
+                  <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">Inventory Management</span>
+                  <span class="dropdown-desc">Real-time stock & expiry radar</span>
+                </div>
+              </a>
+              <a href="/dashboard" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
+                  <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">Business Analytics</span>
+                  <span class="dropdown-desc">Revenue, margins & top medicines</span>
+                </div>
+              </a>
+              <a href="/ai-forecast" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(139, 92, 246, 0.15); color: #8B5CF6;">
+                  <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">AI Forecast</span>
+                  <span class="dropdown-desc">Predictive demand & ARIMA trends</span>
+                </div>
+              </a>
+              <a href="/seasonal-advisor" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+                  <i class="fa-solid fa-cloud-sun-rain"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">Seasonal Advisor</span>
+                  <span class="dropdown-desc">Monsoon, winter & fever wave planning</span>
+                </div>
+              </a>
+              <a href="/pharmacy-assistant" class="dropdown-item">
+                <div class="dropdown-icon" style="background: rgba(236, 72, 153, 0.15); color: #EC4899;">
+                  <i class="fa-solid fa-store"></i>
+                </div>
+                <div class="dropdown-info">
+                  <span class="dropdown-title">Pharmacy Assistant</span>
+                  <span class="dropdown-desc">Setup wizard & intelligent guidance</span>
+                </div>
+              </a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle Theme Mode" title="High-Tech Dark Theme">
+          <i class="fa-regular fa-moon"></i>
+        </button>
+        <a href="/login" class="btn-nav-login" id="nav-btn-login">Login</a>
+        <a href="/register" class="btn-nav-get-started" id="nav-btn-get-started">Get Started</a>
+        
+        <!-- Mobile Menu Hamburger Button -->
+        <button class="mobile-hamburger-btn" id="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer-overlay" id="mobile-drawer-overlay"></div>
+  <aside class="mobile-drawer" id="mobile-drawer">
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <img src="{{ url_for('static', filename='images/pharmora_logo.png') }}" alt="Pharmora Logo" style="height:38px; width:auto;">
+        <span style="font-family:'Outfit'; font-weight:800; color:#fff; font-size:1.15rem; margin-left:8px;">PHARMORA</span>
+      </div>
+      <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    
+    <div class="drawer-content">
+      <ul class="drawer-nav-list">
+        <li><a href="/" class="drawer-link active"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="#features" class="drawer-link"><i class="fa-solid fa-cube"></i> Features</a></li>
+        <li class="drawer-dropdown-item">
+          <div class="drawer-dropdown-header">
+            <span><i class="fa-solid fa-layer-group"></i> Solutions</span>
+          </div>
+          <div class="drawer-submenu">
+            <a href="/pos" class="drawer-sublink"><i class="fa-solid fa-cash-register" style="color:#22C55E;"></i> POS Billing</a>
+            <a href="/stock" class="drawer-sublink"><i class="fa-solid fa-boxes-packing" style="color:#06B6D4;"></i> Inventory Management</a>
+            <a href="/dashboard" class="drawer-sublink"><i class="fa-solid fa-chart-pie" style="color:#3B82F6;"></i> Business Analytics</a>
+            <a href="/ai-forecast" class="drawer-sublink"><i class="fa-solid fa-brain" style="color:#8B5CF6;"></i> AI Forecast</a>
+            <a href="/seasonal-advisor" class="drawer-sublink"><i class="fa-solid fa-cloud-sun-rain" style="color:#F59E0B;"></i> Seasonal Advisor</a>
+            <a href="/pharmacy-assistant" class="drawer-sublink"><i class="fa-solid fa-store" style="color:#EC4899;"></i> Pharmacy Assistant</a>
+          </div>
+        </li>
+      </ul>
+
+      <div class="drawer-actions">
+        <a href="/login" class="btn btn-secondary drawer-btn" id="drawer-btn-login"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="/register" class="btn btn-primary drawer-btn" id="drawer-btn-get-started"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       2. HERO SECTION
+       ========================================================================= -->
+  <section class="hero-section" id="hero">
+    <!-- Ambient Glow Backgrounds -->
+    <div class="hero-ambient-glow glow-green"></div>
+    <div class="hero-ambient-glow glow-cyan"></div>
+
+    <div class="hero-container">
+      
+      <!-- Left Column: Content -->
+      <div class="hero-content">
+        
+        <!-- Glowing Badge -->
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span class="badge-text">INTELLIGENT PHARMACY GROWTH PARTNER</span>
+        </div>
+
+        <!-- SaaS Headline -->
+        <h1 class="hero-headline">
+          <span class="headline-white">Run Smarter.</span><br>
+          <span class="headline-white">Grow Faster.</span><br>
+          <span class="headline-gradient">Pharmora.</span>
+        </h1>
+
+        <!-- Hero Subtitle / Description -->
+        <p class="hero-description">
+          All-in-one pharmacy management platform with POS billing, inventory control, AI forecasting, analytics & more — built to grow your pharmacy business.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-cta-group">
+          <a href="/register" class="btn btn-hero-primary" id="hero-get-started-cta">
+            <i class="fa-solid fa-rocket"></i> Get Started Free
+          </a>
+          <a href="/dashboard" class="btn btn-hero-secondary">
+            <i class="fa-solid fa-gauge-high"></i> Book a Demo
+          </a>
+          <button type="button" class="btn-watch-overview" id="btn-open-overview-modal" aria-haspopup="dialog">
+            <span class="play-icon-box"><i class="fa-solid fa-play"></i></span>
+            <span class="play-text">Watch Overview</span>
+          </button>
+        </div>
+
+        <!-- Value Badges -->
+        <div class="hero-benefits-row">
+          <div class="benefit-item benefit-green">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Easy to Use</span>
+          </div>
+          <div class="benefit-item benefit-blue">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Secure & Reliable</span>
+          </div>
+          <div class="benefit-item benefit-purple">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>AI-Powered Insights</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Dashboard Mockup Preview Frame -->
+      <div class="hero-visual">
+        <div class="dashboard-preview-card">
+          
+          <!-- Mockup Window Bar -->
+          <div class="preview-card-header">
+            <div class="window-controls">
+              <span class="dot dot-close"></span>
+              <span class="dot dot-minimize"></span>
+              <span class="dot dot-maximize"></span>
+            </div>
+            <div class="window-title">
+              <i class="fa-solid fa-gauge-high" style="color:#22C55E; margin-right:6px;"></i>
+              <span>Pharmora Live Intelligence Dashboard</span>
+            </div>
+            <div class="window-status">
+              <span class="status-live-badge"><span class="pulse-light"></span> Live Active</span>
+            </div>
+          </div>
+
+          <!-- Product Preview Image -->
+          <div class="preview-image-wrapper">
+            <a href="/dashboard" title="Click to view live Pharmora Dashboard" class="preview-image-link">
+              <img src="{{ url_for('static', filename='images/dashboard_preview.png') }}" 
+                   alt="Pharmora Intelligent Pharmacy Dashboard Preview" 
+                   class="dashboard-mockup-img"
+                   loading="eager"
+                   onerror="this.src='{{ url_for('static', filename='images/dashboard_preview_cropped.png') }}'">
+              <div class="preview-overlay-hover">
+                <span class="overlay-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Dashboard</span>
+              </div>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       3. WATCH OVERVIEW MODAL
+       ========================================================================= -->
+  <div class="overview-modal-backdrop" id="overview-modal" role="dialog" aria-modal="true" aria-labelledby="overview-modal-title" style="display:none;">
+    <div class="overview-modal-card">
+      <div class="overview-modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:50%; background:rgba(34,197,94,0.15); display:flex; align-items:center; justify-content:center; color:#22C55E;">
+            <i class="fa-solid fa-play"></i>
+          </div>
+          <div>
+            <h3 id="overview-modal-title" style="font-family:'Outfit'; font-size:1.25rem; font-weight:700; color:#F8FAFC; margin:0;">Pharmora Product Overview</h3>
+            <p style="font-size:0.8rem; color:#94A3B8; margin:0;">Intelligent Operations, Real-Time POS & Predictive AI</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btn-close-overview-modal" aria-label="Close overview modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="overview-modal-body">
+        <!-- Walkthrough Video / Preview Showcase -->
+        <div class="video-placeholder-container">
+          <div class="video-preview-glow"></div>
+          <div class="video-content-box">
+            <img src="{{ url_for('static', filename='images/dashboard_preview.png') }}" alt="Pharmora Overview" class="video-preview-thumb">
+            <div class="video-play-overlay">
+              <div class="pulse-play-circle">
+                <i class="fa-solid fa-play"></i>
+              </div>
+              <h4 style="color:#F8FAFC; font-family:'Outfit'; font-size:1.1rem; margin-top:12px; font-weight:700;">Pharmora 3-Minute Walkthrough</h4>
+              <p style="color:#CBD5E1; font-size:0.82rem; max-width:400px; text-align:center; margin-top:4px;">
+                Discover how Pharmora empowers independent pharmacies and multi-store retail chains with lightning-fast POS and AI demand forecasting.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Capability Cards in Modal -->
+        <div class="overview-feature-pills">
+          <div class="modal-feature-pill">
+            <i class="fa-solid fa-bolt" style="color:#22C55E;"></i>
+            <div>
+              <strong>Instant POS Checkout</strong>
+              <span>Automatic inventory deduction & GST invoices</span>
+            </div>
+          </div>
+          <div class="modal-feature-pill">
+            <i class="fa-solid fa-chart-line" style="color:#06B6D4;"></i>
+            <div>
+              <strong>ML Demand Forecast</strong>
+              <span>Predict upcoming medicine demand 30 days ahead</span>
+            </div>
+          </div>
+          <div class="modal-feature-pill">
+            <i class="fa-solid fa-shield-virus" style="color:#8B5CF6;"></i>
+            <div>
+              <strong>Expiry Risk Radar</strong>
+              <span>Prevent batch loss with proactive markdown alerts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-modal-footer">
+        <a href="/dashboard" class="btn btn-primary" style="flex:1; justify-content:center; padding:0.75rem 1.25rem;">
+          <i class="fa-solid fa-gauge-high"></i> Explore Live Platform
+        </a>
+        <button type="button" class="btn btn-secondary" id="btn-close-modal-secondary" style="padding:0.75rem 1.25rem;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. FEATURES SECTION ("EVERYTHING YOU NEED TO MANAGE & GROW")
+       ========================================================================= -->
+  <section class="features-section" id="features">
+    <div class="section-container">
+      
+      <!-- Section Header -->
+      <div class="section-header text-center">
+        <span class="section-badge">PLATFORM CAPABILITIES</span>
+        <h2 class="section-title">Everything You Need to Manage & Grow</h2>
+        <p class="section-subtitle">Powerful tools built specifically for modern pharmacy businesses.</p>
+      </div>
+
+      <!-- 6 Interactive Feature Cards Grid -->
+      <div class="features-grid">
+        
+        <!-- CARD 1: Smart POS Billing -->
+        <a href="/pos" class="feature-card card-pos" style="--card-accent: #22C55E;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(34, 197, 94, 0.12); color: #22C55E; border-color: rgba(34, 197, 94, 0.3);">
+              <i class="fa-solid fa-cash-register"></i>
+            </div>
+            <h3 class="feature-title">Smart POS Billing</h3>
+            <p class="feature-desc">Fast & easy billing with invoice, discount, tax & multiple payment modes.</p>
+            <div class="feature-action-link" style="color: #22C55E;">
+              <span>Open POS Checkout</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 2: Inventory Management -->
+        <a href="/stock" class="feature-card card-inventory" style="--card-accent: #06B6D4;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(6, 182, 212, 0.12); color: #06B6D4; border-color: rgba(6, 182, 212, 0.3);">
+              <i class="fa-solid fa-boxes-packing"></i>
+            </div>
+            <h3 class="feature-title">Inventory Management</h3>
+            <p class="feature-desc">Real-time stock tracking, expiry alerts & smart reorder suggestions.</p>
+            <div class="feature-action-link" style="color: #06B6D4;">
+              <span>Manage Inventory</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 3: AI Forecast & Insights -->
+        <a href="/ai-forecast" class="feature-card card-forecast" style="--card-accent: #8B5CF6;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(139, 92, 246, 0.12); color: #8B5CF6; border-color: rgba(139, 92, 246, 0.3);">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <h3 class="feature-title">AI Forecast & Insights</h3>
+            <p class="feature-desc">Predict demand, identify trends & make data-driven decisions.</p>
+            <div class="feature-action-link" style="color: #8B5CF6;">
+              <span>View AI Forecast</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 4: Business Analytics -->
+        <a href="/dashboard" class="feature-card card-analytics" style="--card-accent: #3B82F6;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(59, 130, 246, 0.12); color: #3B82F6; border-color: rgba(59, 130, 246, 0.3);">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <h3 class="feature-title">Business Analytics</h3>
+            <p class="feature-desc">Powerful dashboards & reports to track sales, profit & performance.</p>
+            <div class="feature-action-link" style="color: #3B82F6;">
+              <span>Launch Analytics</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 5: Seasonal Advisor -->
+        <a href="/seasonal-advisor" class="feature-card card-seasonal" style="--card-accent: #F59E0B;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B; border-color: rgba(245, 158, 11, 0.3);">
+              <i class="fa-solid fa-cloud-sun-rain"></i>
+            </div>
+            <h3 class="feature-title">Seasonal Advisor</h3>
+            <p class="feature-desc">AI-powered suggestions for seasonal demand & stock planning.</p>
+            <div class="feature-action-link" style="color: #F59E0B;">
+              <span>Check Seasonal Trends</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 6: Pharmacy Assistant -->
+        <a href="/pharmacy-assistant" class="feature-card card-assistant" style="--card-accent: #EC4899;">
+          <div class="feature-card-inner">
+            <div class="feature-icon-box" style="background: rgba(236, 72, 153, 0.12); color: #EC4899; border-color: rgba(236, 72, 153, 0.3);">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <h3 class="feature-title">Pharmacy Assistant</h3>
+            <p class="feature-desc">Your intelligent assistant for daily tasks, reminders & recommendations.</p>
+            <div class="feature-action-link" style="color: #EC4899;">
+              <span>Consult Assistant</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Custom Landing Script -->
+  <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>

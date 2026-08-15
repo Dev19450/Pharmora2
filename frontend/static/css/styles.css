@@ -968,6 +968,13 @@ a {
   box-shadow: var(--shadow-glow);
 }
 
+.auth-modal-home-btn:hover {
+  background: var(--palette-lime) !important;
+  color: #0F0F0F !important;
+  box-shadow: 0 0 14px rgba(93, 214, 44, 0.5) !important;
+  transform: translateY(-1px);
+}
+
 .auth-tabs {
   display: flex;
   background: rgba(20, 20, 20, 0.9);

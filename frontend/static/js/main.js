@@ -91,7 +91,10 @@ function initAuth() {
             tabSignup.classList.remove('active');
             formLogin.style.display = 'block';
             formSignup.style.display = 'none';
+            formSignup.reset();
+            resetSignupWizard();
             if (loginErrorAlert) loginErrorAlert.style.display = 'none';
+            if (signupErrorAlert) signupErrorAlert.style.display = 'none';
         });
 
         tabSignup.addEventListener('click', () => {
@@ -99,8 +102,20 @@ function initAuth() {
             tabLogin.classList.remove('active');
             formSignup.style.display = 'block';
             formLogin.style.display = 'none';
+            formLogin.reset();
             resetSignupWizard();
+            if (loginErrorAlert) loginErrorAlert.style.display = 'none';
+            if (signupErrorAlert) signupErrorAlert.style.display = 'none';
         });
+
+        // Check URL parameter for initial auth mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const authParam = urlParams.get('auth');
+        if (authParam === 'register' || authParam === 'signup') {
+            tabSignup.click();
+        } else if (authParam === 'login') {
+            tabLogin.click();
+        }
     }
 
     // 2. Demo Quick Sign-in Buttons
@@ -146,6 +161,14 @@ function initAuth() {
                 loadDashboardData();
                 fetchInvoiceHistory();
                 fetchStockLogs();
+
+                // If URL specified a tab, activate it
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetTab = urlParams.get('tab');
+                if (targetTab) {
+                    const navItem = document.querySelector(`.nav-item[data-tab="${targetTab}"]`);
+                    if (navItem) navItem.click();
+                }
             } catch (err) {
                 showError(loginErrorAlert, "Server connection failed. Please check network.");
             }
@@ -200,6 +223,10 @@ function initAuth() {
     // Return to Step 1
     if (btnBackToStep1) {
         btnBackToStep1.addEventListener('click', () => {
+            chkConfirmEmail.checked = false;
+            chkConfirmPhone.checked = false;
+            chkConfirmAccess.checked = false;
+            if (confirmErrorAlert) confirmErrorAlert.style.display = 'none';
             stepConfirm.style.display = 'none';
             step1.style.display = 'block';
         });
@@ -637,7 +664,7 @@ function initAuth() {
             clearInterval(resendEmailTimerInterval);
             clearInterval(resendPhoneTimerInterval);
             clearInterval(otpExpiryTimerInterval);
-            if (authOverlay) authOverlay.style.display = 'flex';
+            window.location.href = '/';
         });
     }
 
@@ -858,6 +885,16 @@ function initNavigation() {
         });
     });
 
+    // Check URL parameter for initial tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTab = urlParams.get('tab');
+    if (initialTab) {
+        const targetNavItem = document.querySelector(`.nav-item[data-tab="${initialTab}"]`);
+        if (targetNavItem) {
+            targetNavItem.click();
+        }
+    }
+
     // Window Resize Handler for responsive chart recalculation
     window.addEventListener('resize', () => {
         if (window.innerWidth > 767) {
@@ -883,16 +920,32 @@ function initAddStockModule() {
 
     if (radioExisting && radioNew) {
         radioExisting.addEventListener('change', () => {
+            if (formNew) formNew.reset();
             formExisting.style.display = 'block';
             formNew.style.display = 'none';
+            updateStockAddPreview();
         });
         radioNew.addEventListener('change', () => {
+            if (formExisting) {
+                formExisting.reset();
+                if (medSelect) medSelect.value = '';
+            }
             formExisting.style.display = 'none';
             formNew.style.display = 'block';
+            updateStockAddPreview();
         });
     }
 
-    if (medSelect) medSelect.addEventListener('change', updateStockAddPreview);
+    if (medSelect) {
+        medSelect.addEventListener('change', () => {
+            if (!medSelect.value) {
+                const batchInput = document.getElementById('stock-add-batch-input');
+                if (batchInput) batchInput.value = '';
+                if (qtyInput) qtyInput.value = '100';
+            }
+            updateStockAddPreview();
+        });
+    }
     if (qtyInput) qtyInput.addEventListener('input', updateStockAddPreview);
 
     // Form 1: Replenish Existing
@@ -921,6 +974,9 @@ function initAddStockModule() {
                 }
 
                 alert(data.message);
+                formExisting.reset();
+                if (medSelect) medSelect.value = '';
+                updateStockAddPreview();
                 loadDashboardData();
                 fetchStockLogs();
             } catch (err) {
@@ -1153,6 +1209,8 @@ function initPOSBilling() {
             }
 
             renderPOSCart();
+            if (medSelect) medSelect.value = "";
+            if (qtyInput) qtyInput.value = "10";
             updatePOSStockPreview();
         });
     }
@@ -1178,8 +1236,12 @@ function updatePOSStockPreview() {
 
     if (!medName) {
         if (priceDisplay) priceDisplay.value = "₹0";
+        if (qtyInput && qtyInput.value === "") qtyInput.value = "10";
         if (stockVal) stockVal.innerText = "0 strips";
-        if (remainVal) remainVal.innerText = "0 strips";
+        if (remainVal) {
+            remainVal.innerText = "0 strips";
+            remainVal.style.color = "";
+        }
         return;
     }
 
@@ -1304,6 +1366,17 @@ async function processPOSCheckout() {
         renderPOSCart();
         renderInvoiceModal(data.invoice);
         
+        // Clear POS Customer & Item Form Details
+        const custNameInput = document.getElementById('pos-customer-name');
+        const custPhoneInput = document.getElementById('pos-customer-phone');
+        const medSelect = document.getElementById('pos-med-select');
+        const qtyInput = document.getElementById('pos-qty-input');
+        if (custNameInput) custNameInput.value = '';
+        if (custPhoneInput) custPhoneInput.value = '';
+        if (medSelect) medSelect.value = '';
+        if (qtyInput) qtyInput.value = '10';
+        updatePOSStockPreview();
+
         loadDashboardData();
         fetchInvoiceHistory();
 
