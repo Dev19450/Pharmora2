@@ -225,11 +225,8 @@ def generate_pdf_report(df: pd.DataFrame, kpis: dict, stock_info: dict, forecast
     doc.build(elements)
     return output.getvalue()
 
-    doc.build(elements)
-    return output.getvalue()
-
 def generate_customer_invoice_pdf(invoice: dict) -> bytes:
-    """Generates official customer sales invoice receipt PDF."""
+    """Generates official customer sales invoice receipt PDF with proper ReportLab styling."""
     output = io.BytesIO()
 
     if not REPORTLAB_AVAILABLE:
@@ -254,21 +251,38 @@ def generate_customer_invoice_pdf(invoice: dict) -> bytes:
         'InvMeta',
         parent=styles['Normal'],
         fontSize=9,
-        textColor=colors.HexColor("#337418")
+        textColor=colors.HexColor("#15803d")
+    )
+    cell_style = ParagraphStyle(
+        'InvCell',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.HexColor("#202020"),
+        leading=12
     )
 
     elements = []
 
     # Store Banner & Invoice Number
-    elements.append(Paragraph(f"<b>{invoice.get('store_name', 'PHARMA-AI HEALTHCARE PHARMACY')}</b>", header_style))
-    elements.append(Paragraph(f"Official Tax Invoice | License No: PHARM-2026-REG | GSTIN: 27AAAAA0000A1Z5", meta_style))
+    store_name = invoice.get('store_name') or 'HealthCare Central Pharmacy'
+    elements.append(Paragraph(f"<b>{store_name}</b>", header_style))
+    elements.append(Paragraph("Official Tax Invoice | License No: PHARM-2026-REG | GSTIN: 27AAAAA0000A1Z5", meta_style))
     elements.append(Spacer(1, 10))
 
-    # Invoice Details Table
+    # Invoice Details Table (using Paragraphs so <b> tags render properly)
     info_data = [
-        [f"<b>Invoice No:</b> {invoice.get('invoice_no')}", f"<b>Date:</b> {invoice.get('date')}"],
-        [f"<b>Customer Name:</b> {invoice.get('customer_name')}", f"<b>Contact:</b> {invoice.get('customer_phone')}"],
-        [f"<b>Billed By:</b> {invoice.get('billed_by')}", f"<b>Payment Mode:</b> Cash / UPI"]
+        [
+            Paragraph(f"<b>Invoice No:</b> {invoice.get('invoice_no', 'N/A')}", cell_style),
+            Paragraph(f"<b>Date:</b> {invoice.get('date', 'N/A')}", cell_style)
+        ],
+        [
+            Paragraph(f"<b>Customer Name:</b> {invoice.get('customer_name', 'Walk-in Customer')}", cell_style),
+            Paragraph(f"<b>Contact:</b> {invoice.get('customer_phone', 'N/A')}", cell_style)
+        ],
+        [
+            Paragraph(f"<b>Billed By:</b> {invoice.get('billed_by', 'Pharma Staff')}", cell_style),
+            Paragraph(f"<b>Payment Mode:</b> {invoice.get('payment_mode', 'Cash / UPI')}", cell_style)
+        ]
     ]
     t_info = Table(info_data, colWidths=[260, 240])
     t_info.setStyle(TableStyle([
@@ -285,13 +299,13 @@ def generate_customer_invoice_pdf(invoice: dict) -> bytes:
     items_data = [["Item Description", "Category", "Batch", "Qty", "Unit Price", "Remaining Stock", "Total (Rs.)"]]
     for item in invoice.get("items", []):
         items_data.append([
-            item.get("medicine"),
-            item.get("category"),
-            item.get("batch"),
-            f"{item.get('qty')} strips",
-            f"Rs. {item.get('unit_price'):,.2f}",
-            f"{item.get('remaining_stock')} left",
-            f"Rs. {item.get('line_total'):,.2f}"
+            item.get("medicine", ""),
+            item.get("category", ""),
+            item.get("batch", ""),
+            f"{item.get('qty', 0)} strips",
+            f"Rs. {item.get('unit_price', 0):,.2f}",
+            f"{item.get('remaining_stock', 0)} left",
+            f"Rs. {item.get('line_total', 0):,.2f}"
         ])
 
     t_items = Table(items_data, colWidths=[120, 75, 60, 55, 65, 75, 70])
@@ -308,18 +322,20 @@ def generate_customer_invoice_pdf(invoice: dict) -> bytes:
     elements.append(t_items)
     elements.append(Spacer(1, 15))
 
-    # Grand Totals Box
+    # Grand Totals Box (using clean plain text with Helvetica-Bold for final row)
     totals_data = [
         ["Subtotal Amount:", f"Rs. {invoice.get('subtotal', 0):,.2f}"],
         [f"Discount ({invoice.get('discount_pct', 0)}%):", f"- Rs. {invoice.get('discount_amount', 0):,.2f}"],
         ["GST Tax (12%):", f"+ Rs. {invoice.get('tax_amount', 0):,.2f}"],
-        ["<b>Grand Total Payable:</b>", f"<b>Rs. {invoice.get('grand_total', 0):,.2f}</b>"]
+        ["Grand Total Payable:", f"Rs. {invoice.get('grand_total', 0):,.2f}"]
     ]
     t_totals = Table(totals_data, colWidths=[360, 140])
     t_totals.setStyle(TableStyle([
         ('ALIGN', (0,0), (0,-1), 'RIGHT'),
         ('ALIGN', (1,0), (1,-1), 'RIGHT'),
+        ('FONTNAME', (0,0), (-1,-2), 'Helvetica'),
         ('FONTNAME', (0,-1), (-1,-1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 9.5),
         ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor("#5DD62C")),
         ('TEXTCOLOR', (0,-1), (-1,-1), colors.HexColor("#0F0F0F")),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#337418")),
@@ -329,7 +345,15 @@ def generate_customer_invoice_pdf(invoice: dict) -> bytes:
     elements.append(t_totals)
 
     elements.append(Spacer(1, 20))
-    elements.append(Paragraph("<b>Thank you for choosing Pharmora Pharmacy! Get well soon.</b>", ParagraphStyle('Thanks', parent=styles['Normal'], alignment=1, fontSize=10, textColor=colors.HexColor("#337418"))))
+    thanks_style = ParagraphStyle(
+        'Thanks',
+        parent=styles['Normal'],
+        alignment=1,
+        fontSize=10,
+        fontName='Helvetica-Bold',
+        textColor=colors.HexColor("#15803d")
+    )
+    elements.append(Paragraph("Thank you for choosing Pharmora Pharmacy! Get well soon.", thanks_style))
 
     doc.build(elements)
     return output.getvalue()

@@ -3,7 +3,7 @@ import io
 import json
 import pandas as pd
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, send_file, Response, session
+from flask import Flask, render_template, request, jsonify, send_file, Response, session, redirect, url_for
 
 try:
     from .column_mapper import clean_and_map_dataframe
@@ -37,6 +37,7 @@ INVOICE_STORE = {}
 INVOICE_HISTORY = []
 STOCK_ADDITION_LOG = []
 INVOICE_COUNTER = 1001
+DEMO_CONTACT_REQUESTS = []
 
 def load_invoice_history():
     global INVOICE_HISTORY, INVOICE_STORE, INVOICE_COUNTER
@@ -119,9 +120,119 @@ def load_initial_dataset():
 load_initial_dataset()
 
 @app.route('/')
-def index():
-    """Render main application page."""
+def home():
+    """Render the official Pharmora SaaS Landing / Home page (Publicly accessible without login)."""
+    return render_template('landing.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """Render the main Pharmora Analytics, POS, & Management Dashboard (Protected: requires login)."""
+    if not session.get('user'):
+        target_tab = request.args.get('tab', '')
+        auth_mode = request.args.get('auth', 'login')
+        if target_tab:
+            return redirect(url_for('login_route', tab=target_tab, auth=auth_mode))
+        return redirect(url_for('login_route', auth=auth_mode))
     return render_template('index.html')
+
+@app.route('/login')
+def login_route():
+    """Direct route for Login modal / screen."""
+    if session.get('user'):
+        target_tab = request.args.get('tab', '')
+        if target_tab:
+            return redirect(url_for('dashboard', tab=target_tab))
+        return redirect(url_for('dashboard'))
+    return render_template('index.html')
+
+@app.route('/register')
+def register_route():
+    """Direct route for Account Registration modal / screen."""
+    if session.get('user'):
+        return redirect(url_for('dashboard'))
+    return render_template('index.html')
+
+@app.route('/pos')
+def pos_shortcut():
+    """Direct shortcut route to POS Billing & Checkout tab (Protected)."""
+    if not session.get('user'):
+        return redirect(url_for('login_route', tab='tab-pos'))
+    return redirect(url_for('dashboard', tab='tab-pos'))
+
+@app.route('/stock')
+def stock_shortcut():
+    """Direct shortcut route to Add/Replenish Stock tab (Protected)."""
+    if not session.get('user'):
+        return redirect(url_for('login_route', tab='tab-add-stock'))
+    return redirect(url_for('dashboard', tab='tab-add-stock'))
+
+@app.route('/ai-forecast')
+@app.route('/ai_forecast')
+def ai_forecast_shortcut():
+    """Direct shortcut route to AI Forecast tab (Protected)."""
+    if not session.get('user'):
+        return redirect(url_for('login_route', tab='tab-ai-forecast'))
+    return redirect(url_for('dashboard', tab='tab-ai-forecast'))
+
+@app.route('/seasonal-advisor')
+@app.route('/seasonal_advisor')
+def seasonal_advisor_shortcut():
+    """Direct shortcut route to Seasonal Advisor tab (Protected)."""
+    if not session.get('user'):
+        return redirect(url_for('login_route', tab='tab-seasonal'))
+    return redirect(url_for('dashboard', tab='tab-seasonal'))
+
+@app.route('/pharmacy-assistant')
+@app.route('/pharmacy_assistant')
+def pharmacy_assistant_shortcut():
+    """Direct shortcut route to New Pharmacy Assistant tab (Protected)."""
+    if not session.get('user'):
+        return redirect(url_for('login_route', tab='tab-assistant'))
+    return redirect(url_for('dashboard', tab='tab-assistant'))
+
+@app.route('/pricing')
+def pricing_route():
+    """Pricing anchor navigation."""
+    return redirect('/#pricing')
+
+@app.route('/about')
+def about_route():
+    """About Us anchor navigation."""
+    return redirect('/#about')
+
+@app.route('/contact')
+def contact_route():
+    """Contact anchor navigation."""
+    return redirect('/#contact')
+
+@app.route('/api/contact', methods=['POST'])
+def handle_contact_inquiry():
+    """Handle Demo Booking & Contact Inquiries from Landing Page."""
+    global DEMO_CONTACT_REQUESTS
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+    phone = data.get("phone", "").strip()
+    store_name = data.get("store_name", "").strip()
+    message = data.get("message", "").strip()
+
+    if not name or (not email and not phone):
+        return jsonify({"success": False, "error": "Please provide your name and at least an email or mobile phone number."}), 400
+
+    entry = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "store_name": store_name,
+        "message": message
+    }
+    DEMO_CONTACT_REQUESTS.append(entry)
+
+    return jsonify({
+        "success": True,
+        "message": f"Thank you, {name}! Your demo request has been received. A Pharmora specialist will reach out to you shortly."
+    })
 
 @app.route('/api/dashboard/full', methods=['GET'])
 def get_full_dashboard():

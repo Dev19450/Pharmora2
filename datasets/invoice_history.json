@@ -1,5 +1,59 @@
 [
   {
+    "invoice_no": "INV-2026-1008",
+    "date": "2026-08-15 03:35:13",
+    "customer_name": "Rahul Sharma",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Card",
+    "items": [
+      {
+        "medicine": "Pantoprazole",
+        "category": "Gastric",
+        "company": "Dr. Reddy's",
+        "batch": "B9856",
+        "qty": 30,
+        "unit_price": 312.04,
+        "line_total": 9361.2,
+        "previous_stock": 40,
+        "remaining_stock": 10
+      }
+    ],
+    "subtotal": 9361.2,
+    "discount_pct": 20.0,
+    "discount_amount": 1872.24,
+    "tax_amount": 898.68,
+    "grand_total": 8387.64
+  },
+  {
+    "invoice_no": "INV-2026-1007",
+    "date": "2026-08-15 03:32:26",
+    "customer_name": "Rahul Sharma",
+    "customer_phone": "9876543210",
+    "billed_by": "Dr. Sarah Jenkins",
+    "store_name": "HealthCare Central Pharmacy",
+    "payment_mode": "Card",
+    "items": [
+      {
+        "medicine": "Pantoprazole",
+        "category": "Gastric",
+        "company": "Dr. Reddy's",
+        "batch": "B9856",
+        "qty": 10,
+        "unit_price": 312.04,
+        "line_total": 3120.4,
+        "previous_stock": 50,
+        "remaining_stock": 40
+      }
+    ],
+    "subtotal": 3120.4,
+    "discount_pct": 5.0,
+    "discount_amount": 156.02,
+    "tax_amount": 355.73,
+    "grand_total": 3320.11
+  },
+  {
     "invoice_no": "INV-2026-1006",
     "date": "2026-08-15 00:08:49",
     "customer_name": "Test Customer",
