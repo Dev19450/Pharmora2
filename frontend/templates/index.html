@@ -51,7 +51,7 @@
         <div class="form-group" style="margin-bottom:1rem;">
           <label><i class="fa-solid fa-user-shield" style="margin-right:5px; color:var(--palette-lime);"></i> Email or
             Mobile Phone Number</label>
-          <input type="text" id="login-email" class="form-control" placeholder="e.g. owner@pharma.com or 9811223344"
+          <input type="text" id="login-email" class="form-control" placeholder="e.g. name@pharmacy.com or 9811223344"
             required>
         </div>
         <div class="form-group" style="margin-bottom:1.25rem;">
@@ -66,309 +66,45 @@
             class="fa-solid fa-right-to-bracket" style="margin-right:8px;"></i> Sign In</button>
       </form>
 
-      <!-- Signup Form & Dual OTP Verification Flow -->
+      <!-- Direct Signup Form (No OTP) -->
       <form id="form-signup" class="auth-form" style="display:none;">
-
-        <!-- STEP 1: Registration Details Input -->
-        <div id="signup-step1">
-          <div class="form-group" style="margin-bottom:0.75rem;">
-            <label><i class="fa-solid fa-user" style="margin-right:5px; color:var(--palette-lime);"></i> Full
-              Name</label>
-            <input type="text" id="signup-name" class="form-control" placeholder="Dr. Sarah Jenkins" required>
-          </div>
-          <div class="form-group" style="margin-bottom:0.75rem;">
-            <label><i class="fa-solid fa-envelope" style="margin-right:5px; color:var(--palette-lime);"></i> Email
-              Address</label>
-            <input type="email" id="signup-email" class="form-control" placeholder="sarah@pharmacy.com" required>
-          </div>
-          <div class="form-group" style="margin-bottom:0.75rem;">
-            <label><i class="fa-solid fa-phone" style="margin-right:5px; color:var(--palette-lime);"></i> Mobile Phone
-              Number (+91 India / International)</label>
-            <input type="tel" id="signup-phone" class="form-control" placeholder="9811223344" required>
-          </div>
-          <div class="form-group" style="margin-bottom:0.75rem;">
-            <label><i class="fa-solid fa-lock" style="margin-right:5px; color:var(--palette-lime);"></i>
-              Password</label>
-            <input type="password" id="signup-password" class="form-control" placeholder="••••••••" minlength="4"
-              required>
-          </div>
-          <div class="form-group" style="margin-bottom:0.75rem;">
-            <label><i class="fa-solid fa-store" style="margin-right:5px; color:var(--palette-lime);"></i> Pharmacy Store
-              Name</label>
-            <input type="text" id="signup-store" class="form-control" placeholder="HealthCare Central Pharmacy"
-              required>
-          </div>
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label><i class="fa-solid fa-id-badge" style="margin-right:5px; color:var(--palette-lime);"></i> Account
-              Role</label>
-            <select id="signup-role" class="form-control">
-              <option value="owner">Pharmacy Owner (Full Access)</option>
-              <option value="manager">Store Manager (Inventory & Uploads)</option>
-              <option value="admin">System Admin (Full Access)</option>
-              <option value="staff">Sales Staff (Operations & POS Only)</option>
-            </select>
-          </div>
-          <div id="signup-error-alert"
-            style="display:none; color:var(--accent-rose); font-size:0.82rem; margin-bottom:1rem; font-weight:600; text-align:center;">
-          </div>
-          <button type="button" id="btn-goto-confirm" class="btn btn-primary"
-            style="width:100%; justify-content:center; padding:0.85rem; font-size:0.95rem; font-weight:700; border-radius:8px;">
-            <i class="fa-solid fa-arrow-right" style="margin-right:8px;"></i> Next: Verify Details
-          </button>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label><i class="fa-solid fa-user" style="margin-right:5px; color:var(--palette-lime);"></i> Full Name</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="Dr. Sarah Jenkins" required>
         </div>
-
-        <!-- STEP 1.5: Contact Details Confirmation Step -->
-        <div id="signup-step-confirm" style="display:none;">
-          <div style="text-align:center; margin-bottom:1.25rem;">
-            <div
-              style="width:48px; height:48px; margin:0 auto 0.5rem; background:rgba(93,214,44,0.15); border:1px solid var(--palette-lime); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--palette-lime); font-size:1.35rem;">
-              <i class="fa-solid fa-user-check"></i>
-            </div>
-            <h3 style="font-family:'Outfit'; font-size:1.3rem; font-weight:700; color:#F8F8F8; margin-bottom:0.25rem;">
-              Verify Your Details</h3>
-            <p style="font-size:0.82rem; color:var(--text-muted); margin:0;">
-              We will send distinct 6-digit verification codes to the following contact details:
-            </p>
-          </div>
-
-          <!-- Email Confirmation Box -->
-          <div
-            style="background:rgba(20,20,20,0.9); border:1px solid var(--border-glass); border-radius:10px; padding:0.9rem; margin-bottom:0.85rem;">
-            <div
-              style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; margin-bottom:0.25rem;">
-              <i class="fa-solid fa-envelope" style="color:var(--palette-lime);"></i> Email Address
-            </div>
-            <div id="confirm-display-email"
-              style="font-size:1rem; font-weight:700; color:#F8F8F8; margin-bottom:0.5rem; word-break:break-all;">
-              user@example.com
-            </div>
-            <label
-              style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--text-sub); cursor:pointer;">
-              <input type="checkbox" id="chk-confirm-email"
-                style="accent-color:var(--palette-lime); width:17px; height:17px;">
-              <span><strong>Yes, this is my email address</strong> and I have access to it.</span>
-            </label>
-          </div>
-
-          <!-- Mobile Confirmation Box -->
-          <div
-            style="background:rgba(20,20,20,0.9); border:1px solid var(--border-glass); border-radius:10px; padding:0.9rem; margin-bottom:0.85rem;">
-            <div
-              style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; margin-bottom:0.25rem;">
-              <i class="fa-solid fa-phone" style="color:var(--palette-lime);"></i> Mobile Phone Number
-            </div>
-            <div id="confirm-display-phone"
-              style="font-size:1rem; font-weight:700; color:#F8F8F8; margin-bottom:0.5rem;">
-              +91 9876543210
-            </div>
-            <label
-              style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--text-sub); cursor:pointer;">
-              <input type="checkbox" id="chk-confirm-phone"
-                style="accent-color:var(--palette-lime); width:17px; height:17px;">
-              <span><strong>Yes, this is my mobile number</strong> and I have access to it.</span>
-            </label>
-          </div>
-
-          <!-- Combined Access Declaration -->
-          <div
-            style="margin-bottom:1.15rem; padding:0.65rem 0.85rem; background:rgba(93,214,44,0.06); border:1px dashed rgba(93,214,44,0.3); border-radius:8px;">
-            <label
-              style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.82rem; color:#F8F8F8; cursor:pointer;">
-              <input type="checkbox" id="chk-confirm-access"
-                style="accent-color:var(--palette-lime); width:17px; height:17px; margin-top:2px;">
-              <span>I confirm that I currently have active access to both the above email address and mobile
-                number.</span>
-            </label>
-          </div>
-
-          <div id="confirm-error-alert"
-            style="display:none; color:var(--accent-rose); font-size:0.82rem; margin-bottom:1rem; font-weight:600; text-align:center;">
-          </div>
-
-          <div style="display:flex; gap:0.75rem;">
-            <button type="button" id="btn-back-to-step1" class="btn btn-secondary"
-              style="flex:1; justify-content:center; padding:0.75rem;">
-              <i class="fa-solid fa-arrow-left"></i> Edit Details
-            </button>
-            <button type="button" id="btn-request-dual-otp" class="btn btn-primary"
-              style="flex:2; justify-content:center; padding:0.75rem; font-weight:700;">
-              <i class="fa-solid fa-shield-halved"></i> Send Verification Codes
-            </button>
-          </div>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label><i class="fa-solid fa-envelope" style="margin-right:5px; color:var(--palette-lime);"></i> Email Address</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="sarah@pharmacy.com" required>
         </div>
-
-        <!-- STEP 2: Dual 6-Box OTP Verification Screen -->
-        <div id="otp-step-container" style="display:none;">
-          <div style="text-align:center; margin-bottom:1rem;">
-            <div
-              style="width:48px; height:48px; margin:0 auto 0.4rem; background:rgba(93,214,44,0.15); border:1px solid var(--palette-lime); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--palette-lime); font-size:1.35rem; box-shadow: 0 0 15px rgba(93,214,44,0.3);">
-              <i class="fa-solid fa-shield-check"></i>
-            </div>
-            <h3 style="font-family:'Outfit'; font-size:1.25rem; font-weight:700; color:#F8F8F8; margin-bottom:0.15rem;">
-              Verify Your Pharmora Account</h3>
-            <p style="font-size:0.8rem; color:var(--text-sub); margin:0;">
-              Enter the 6-digit verification codes sent to each channel below.
-            </p>
-          </div>
-
-          <!-- Real Provider Delivery Status Bar -->
-          <div
-            style="background:rgba(20,20,20,0.92); border:1px solid var(--border-glass); border-radius:10px; padding:0.75rem 0.85rem; margin-bottom:1.15rem; font-size:0.8rem; display:flex; flex-direction:column; gap:0.45rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:210px;"><i
-                  class="fa-solid fa-envelope" style="color:var(--palette-lime); margin-right:5px;"></i> <strong
-                  id="otp-display-email">user@email.com</strong></span>
-              <span id="badge-email-delivery" class="badge badge-warning"><i class="fa-solid fa-spinner fa-spin"></i>
-                Dispathing...</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:210px;"><i
-                  class="fa-solid fa-phone" style="color:var(--palette-lime); margin-right:5px;"></i> <strong
-                  id="otp-display-phone">+91 9876543210</strong></span>
-              <span id="badge-phone-delivery" class="badge badge-warning"><i class="fa-solid fa-spinner fa-spin"></i>
-                Dispathing...</span>
-            </div>
-          </div>
-
-          <!-- Component 1: Email 6-Box OTP Input -->
-          <div class="otp-channel-group"
-            style="background:rgba(25,25,25,0.85); border:1px solid var(--border-glass); border-radius:10px; padding:0.9rem; margin-bottom:1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <label style="font-size:0.8rem; font-weight:700; color:#F8F8F8; margin:0;">
-                <i class="fa-solid fa-envelope-open-text" style="color:var(--palette-lime); margin-right:4px;"></i>
-                Email Verification Code
-              </label>
-              <span id="status-email-tag"
-                style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Pending</span>
-            </div>
-            <div class="otp-boxes-grid" id="grid-email-otp">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="0" autocomplete="one-time-code">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="1">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="2">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="3">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="4">
-              <input type="text" class="otp-digit-box otp-box-email" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="5">
-            </div>
-            <div
-              style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem; font-size:0.75rem;">
-              <span id="alert-email-otp" style="color:var(--accent-rose); font-weight:600;"></span>
-              <button type="button" id="btn-resend-email-otp" class="btn btn-secondary"
-                style="font-size:0.72rem; padding:0.25rem 0.5rem; margin-left:auto;" disabled>
-                <i class="fa-solid fa-rotate-right"></i> <span id="resend-email-text">Resend in 60s</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Component 2: Mobile SMS 6-Box OTP Input -->
-          <div class="otp-channel-group"
-            style="background:rgba(25,25,25,0.85); border:1px solid var(--border-glass); border-radius:10px; padding:0.9rem; margin-bottom:1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <label style="font-size:0.8rem; font-weight:700; color:#F8F8F8; margin:0;">
-                <i class="fa-solid fa-message" style="color:var(--palette-lime); margin-right:4px;"></i> Mobile SMS
-                Verification Code
-              </label>
-              <span id="status-phone-tag"
-                style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Pending</span>
-            </div>
-            <div class="otp-boxes-grid" id="grid-phone-otp">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="0" autocomplete="one-time-code">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="1">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="2">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="3">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="4">
-              <input type="text" class="otp-digit-box otp-box-phone" maxlength="1" inputmode="numeric" pattern="[0-9]*"
-                data-index="5">
-            </div>
-            <div
-              style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem; font-size:0.75rem;">
-              <span id="alert-phone-otp" style="color:var(--accent-rose); font-weight:600;"></span>
-              <button type="button" id="btn-resend-phone-otp" class="btn btn-secondary"
-                style="font-size:0.72rem; padding:0.25rem 0.5rem; margin-left:auto;" disabled>
-                <i class="fa-solid fa-rotate-right"></i> <span id="resend-phone-text">Resend in 60s</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Expiration countdown & General Alert -->
-          <div
-            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; font-size:0.78rem;">
-            <span style="color:var(--text-muted);"><i class="fa-regular fa-clock"
-                style="color:var(--palette-lime);"></i> Code expires in: <strong id="otp-expiry-countdown"
-                style="color:#F8F8F8;">05:00</strong></span>
-          </div>
-
-          <div id="otp-global-error-alert"
-            style="display:none; color:var(--accent-rose); font-size:0.82rem; margin-bottom:0.85rem; font-weight:600; text-align:center;">
-          </div>
-
-          <!-- Verify Both Action Button -->
-          <button type="button" id="btn-verify-dual-otp" class="btn btn-primary"
-            style="width:100%; justify-content:center; padding:0.85rem; font-size:0.95rem; font-weight:700; border-radius:8px; margin-bottom:0.85rem;">
-            <i class="fa-solid fa-circle-check"></i> Verify Email & Mobile
-          </button>
-
-          <!-- Back / Change Details -->
-          <div
-            style="text-align:center; font-size:0.8rem; border-top:1px solid var(--border-glass); padding-top:0.75rem;">
-            <a href="javascript:void(0)" id="btn-back-signup"
-              style="color:var(--palette-lime); text-decoration:underline; cursor:pointer;">
-              <i class="fa-solid fa-pen-to-square"></i> Change Email / Mobile Number
-            </a>
-          </div>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label><i class="fa-solid fa-phone" style="margin-right:5px; color:var(--palette-lime);"></i> Mobile Phone Number</label>
+          <input type="tel" id="signup-phone" class="form-control" placeholder="9811223344" required>
         </div>
-
-        <!-- STEP 3: Verification Success Screen -->
-        <div id="signup-step-success" style="display:none; text-align:center; padding:1.5rem 0.5rem;">
-          <div
-            style="width:60px; height:60px; margin:0 auto 1rem; background:rgba(93,214,44,0.2); border:2px solid var(--palette-lime); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--palette-lime); font-size:1.8rem; box-shadow: 0 0 25px rgba(93,214,44,0.4);">
-            <i class="fa-solid fa-check"></i>
-          </div>
-          <h3 style="font-family:'Outfit'; font-size:1.4rem; font-weight:800; color:#F8F8F8; margin-bottom:0.35rem;">
-            Account Verified!</h3>
-          <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1.25rem;">
-            Both your Email and Mobile Phone Number have been successfully verified.
-          </p>
-          <div
-            style="background:rgba(20,20,20,0.9); border:1px solid rgba(93,214,44,0.3); border-radius:10px; padding:0.85rem; margin-bottom:1.5rem; text-align:left; font-size:0.82rem; display:flex; flex-direction:column; gap:0.4rem;">
-            <div><i class="fa-solid fa-circle-check" style="color:var(--palette-lime); margin-right:6px;"></i> Email:
-              <strong style="color:#F8F8F8;" id="success-email-val">user@email.com</strong> (Verified)
-            </div>
-            <div><i class="fa-solid fa-circle-check" style="color:var(--palette-lime); margin-right:6px;"></i> Mobile:
-              <strong style="color:#F8F8F8;" id="success-phone-val">+91 9876543210</strong> (Verified)
-            </div>
-          </div>
-          <button type="button" id="btn-continue-dashboard" class="btn btn-primary"
-            style="width:100%; justify-content:center; padding:0.85rem; font-size:1rem; font-weight:800; border-radius:8px;">
-            <i class="fa-solid fa-gauge-high"></i> Continue to Pharmora Dashboard
-          </button>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label><i class="fa-solid fa-lock" style="margin-right:5px; color:var(--palette-lime);"></i> Password</label>
+          <input type="password" id="signup-password" class="form-control" placeholder="••••••••" minlength="4" required>
         </div>
+        <div class="form-group" style="margin-bottom:0.75rem;">
+          <label><i class="fa-solid fa-store" style="margin-right:5px; color:var(--palette-lime);"></i> Pharmacy Store Name</label>
+          <input type="text" id="signup-store" class="form-control" placeholder="HealthCare Central Pharmacy" required>
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label><i class="fa-solid fa-id-badge" style="margin-right:5px; color:var(--palette-lime);"></i> Account Role</label>
+          <select id="signup-role" class="form-control">
+            <option value="owner">Pharmacy Owner (Full Access)</option>
+            <option value="manager">Store Manager (Inventory & Uploads)</option>
+            <option value="admin">System Admin (Full Access)</option>
+            <option value="staff">Sales Staff (Operations & POS Only)</option>
+          </select>
+        </div>
+        <div id="signup-error-alert"
+          style="display:none; color:var(--accent-rose); font-size:0.82rem; margin-bottom:1rem; font-weight:600; text-align:center;">
+        </div>
+        <button type="submit" id="btn-submit-signup" class="btn btn-primary"
+          style="width:100%; justify-content:center; padding:0.85rem; font-size:0.95rem; font-weight:700; border-radius:8px;">
+          <i class="fa-solid fa-user-plus" style="margin-right:8px;"></i> Create Account
+        </button>
       </form>
-
-      <!-- Quick Demo Login Buttons -->
-      <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border-glass); text-align:center;">
-        <p style="font-size:0.75rem; color:var(--text-dim); margin-bottom:0.6rem;">Quick Demo Sign In:</p>
-        <div style="display:flex; gap:0.4rem; justify-content:center;">
-          <button class="btn btn-secondary demo-login-btn" data-email="owner@pharma.com" data-pass="owner123"
-            style="font-size:0.72rem; padding:0.35rem 0.6rem;"><i class="fa-solid fa-user-gear"></i> Owner</button>
-          <button class="btn btn-secondary demo-login-btn" data-email="manager@pharma.com" data-pass="manager123"
-            style="font-size:0.72rem; padding:0.35rem 0.6rem;"><i class="fa-solid fa-user-check"></i> Manager</button>
-          <button class="btn btn-secondary demo-login-btn" data-email="staff@pharma.com" data-pass="staff123"
-            style="font-size:0.72rem; padding:0.35rem 0.6rem;"><i class="fa-solid fa-user"></i> Staff</button>
-          <button class="btn btn-secondary demo-login-btn" data-email="9811223344" data-pass="owner123"
-            style="font-size:0.72rem; padding:0.35rem 0.6rem;"><i class="fa-solid fa-phone"></i> Phone Sign In</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -396,7 +132,11 @@
       </div>
 
       <ul class="nav-menu">
-        <li class="nav-item active" data-tab="tab-pos">
+        <li class="nav-item active" data-tab="tab-dashboard">
+          <i class="fa-solid fa-chart-pie nav-icon"></i>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item" data-tab="tab-pos">
           <i class="fa-solid fa-cash-register nav-icon"></i>
           <span>POS Billing & Checkout</span>
         </li>
@@ -407,10 +147,6 @@
         <li class="nav-item" data-tab="tab-invoice-history">
           <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
           <span>Invoice History</span>
-        </li>
-        <li class="nav-item" data-tab="tab-dashboard">
-          <i class="fa-solid fa-chart-pie nav-icon"></i>
-          <span>Dashboard</span>
         </li>
         <li class="nav-item" data-tab="tab-stock-expiry">
           <i class="fa-solid fa-boxes-stacked nav-icon"></i>
@@ -442,12 +178,11 @@
       <div class="user-profile-badge">
         <div class="user-info" style="width:100%;">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
-            <h4 id="user-display-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Dr. Sarah
-            </h4>
-            <span class="badge badge-info" id="user-role-badge">OWNER</span>
+            <h4 id="user-display-name" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Guest User</h4>
+            <span class="badge badge-info" id="user-role-badge">GUEST</span>
           </div>
           <p id="user-display-store"
-            style="margin-top:0.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Pharmora</p>
+            style="margin-top:0.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Not Signed In</p>
           <button class="btn btn-secondary" id="btn-logout"
             style="width:100%; margin-top:0.75rem; padding:0.45rem 0.5rem; font-size:0.78rem; justify-content:center;">
             <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
@@ -471,10 +206,13 @@
             <i class="fa-solid fa-bars"></i>
           </button>
           <div class="page-title">
-            <h1 id="page-title-text">POS Billing & Customer Checkout</h1>
+            <h1 id="page-title-text">Dashboard</h1>
           </div>
         </div>
         <div class="top-actions">
+          <button class="btn btn-secondary" id="header-reset-btn" onclick="resetUserDataset()" title="Reset workspace data to clean slate (0 records)">
+            <i class="fa-solid fa-rotate-left"></i> <span class="btn-text">Reset Data</span>
+          </button>
           <a href="/api/export/pdf" class="btn btn-primary" id="header-export-btn"><i class="fa-solid fa-download"></i>
             <span class="btn-text">Export PDF</span></a>
           <button class="btn btn-secondary" id="header-upload-btn"
@@ -487,7 +225,7 @@
       <div class="content-body">
 
         <!-- TAB 0: POS BILLING & AUTOMATIC STOCK DEDUCTION -->
-        <section id="tab-pos" class="tab-pane active">
+        <section id="tab-pos" class="tab-pane">
 
           <div class="grid-2 pos-grid-layout">
 
@@ -882,7 +620,7 @@
 
 
         <!-- TAB 1: EXECUTIVE DASHBOARD -->
-        <section id="tab-dashboard" class="tab-pane">
+        <section id="tab-dashboard" class="tab-pane active">
 
           <div class="tableau-toolbar">
             <div class="toolbar-title"><i class="fa-solid fa-sliders"></i> Tableau Dynamic Parameters & Sets</div>
@@ -1478,11 +1216,11 @@
               <input type="file" id="file-upload-input" class="form-control" accept=".csv, .xlsx, .xls">
             </div>
 
-            <div style="display:flex; gap:1rem;">
-              <button class="btn btn-primary" id="btn-upload-file"><i class="fa-solid fa-gears"></i> Upload & Map
-                Sheet</button>
-              <a href="/api/export/mapped-csv" class="btn btn-secondary"><i class="fa-solid fa-download"></i> Download
-                Mapped CSV (mapped_output.csv)</a>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem;">
+              <button class="btn btn-primary" id="btn-upload-file"><i class="fa-solid fa-gears"></i> Upload & Map Sheet</button>
+              <a href="/api/export/mapped-csv" class="btn btn-secondary"><i class="fa-solid fa-download"></i> Download Mapped CSV</a>
+              <button type="button" class="btn btn-secondary" onclick="loadSampleDataset()"><i class="fa-solid fa-flask"></i> Load Sample Data</button>
+              <button type="button" class="btn btn-secondary" style="color:var(--accent-rose);" onclick="resetUserDataset()"><i class="fa-solid fa-rotate-left"></i> Reset to Clean Slate (0 Records)</button>
             </div>
           </div>
 

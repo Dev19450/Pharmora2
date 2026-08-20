@@ -7,10 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 from app import app
 from models import get_db_connection
-from otp_service import (
-    generate_secure_otp,
-    hash_otp,
-    verify_otp_hash,
+from auth import (
     normalize_email,
     normalize_phone,
     is_valid_email,
@@ -22,20 +19,13 @@ class PharmoraAuthTestCase(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
-    def test_otp_crypto_generation(self):
-        """Verify that generated OTP is always a 6-digit numeric string with leading zero support."""
-        for _ in range(50):
-            otp = generate_secure_otp()
-            self.assertEqual(len(otp), 6)
-            self.assertTrue(otp.isdigit())
-
-    def test_otp_hashing_and_verification(self):
-        """Verify HMAC-SHA256 constant-time hash verification."""
-        otp = "018274"
-        otp_hash = hash_otp(otp)
-        self.assertNotEqual(otp, otp_hash)
-        self.assertTrue(verify_otp_hash("018274", otp_hash))
-        self.assertFalse(verify_otp_hash("018275", otp_hash))
+        # Clear test database tables before each test
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users WHERE email LIKE '%@test.com' OR email LIKE '%@pharmora.health' OR email = 'owner@pharma.com'")
+        cursor.execute("DELETE FROM rate_limits")
+        conn.commit()
+        conn.close()
 
     def test_phone_normalization(self):
         """Verify phone normalization into international standard format."""
@@ -52,105 +42,84 @@ class PharmoraAuthTestCase(unittest.TestCase):
         self.assertTrue(is_valid_email("sarah@pharmacy.com"))
         self.assertFalse(is_valid_email("invalid-email"))
 
-    def test_dual_channel_registration_flow(self):
-        """Full end-to-end registration flow with distinct Email & Mobile OTPs and provider acceptance."""
-        test_email = "dual_doctor@pharmora.health"
+    def test_direct_registration_and_session(self):
+        """Verify direct user registration without OTP verification."""
+        test_email = "direct_doctor@pharmora.health"
         test_phone = "+919876500099"
 
-        # Cleanup test user if exists
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE email = ? OR phone = ?", (test_email, test_phone))
-        cursor.execute("DELETE FROM otp_verifications WHERE email = ? OR phone = ?", (test_email, test_phone))
-        cursor.execute("DELETE FROM rate_limits")
-        conn.commit()
-        conn.close()
-
-        # 1. Initiate registration / send dual OTPs
+        # 1. Direct registration
         reg_res = self.app.post('/api/auth/register', json={
-            "name": "Dr. Dual Channel",
+            "name": "Dr. Direct User",
             "email": test_email,
             "phone": test_phone,
             "password": "SecurePassword123",
-            "store_name": "Dual Pharmacy",
+            "store_name": "Direct Pharmacy",
             "role": "owner"
         })
         self.assertEqual(reg_res.status_code, 200)
         data = json.loads(reg_res.data)
         self.assertTrue(data.get("success"))
-        
-        # Verify provider status structure
-        self.assertIn("email", data)
-        self.assertIn("mobile", data)
-        self.assertTrue(data["email"]["requested"])
-        self.assertTrue(data["mobile"]["requested"])
+        self.assertEqual(data['user']['email'], test_email)
 
-        dev_email_otp = data.get("dev_email_otp")
-        dev_phone_otp = data.get("dev_phone_otp")
-        self.assertIsNotNone(dev_email_otp)
-        self.assertIsNotNone(dev_phone_otp)
-
-        # 2. Verify Email OTP independently
-        email_v_res = self.app.post('/api/auth/verify-email-otp', json={
-            "email": test_email,
-            "otp_code": dev_email_otp
-        })
-        self.assertEqual(email_v_res.status_code, 200)
-        email_v_data = json.loads(email_v_res.data)
-        self.assertTrue(email_v_data.get("email_verified"))
-
-        # 3. Verify Mobile OTP independently
-        phone_v_res = self.app.post('/api/auth/verify-phone-otp', json={
-            "phone": test_phone,
-            "otp_code": dev_phone_otp
-        })
-        self.assertEqual(phone_v_res.status_code, 200)
-        phone_v_data = json.loads(phone_v_res.data)
-        self.assertTrue(phone_v_data.get("phone_verified"))
-
-        # 4. Complete Registration & activate account
-        complete_res = self.app.post('/api/auth/verify-otp', json={
-            "email": test_email,
-            "phone": test_phone,
-            "name": "Dr. Dual Channel",
-            "password": "SecurePassword123",
-            "store_name": "Dual Pharmacy",
-            "role": "owner",
-            "purpose": "registration"
-        })
-        self.assertEqual(complete_res.status_code, 200)
-        complete_data = json.loads(complete_res.data)
-        self.assertTrue(complete_data.get("fully_verified"))
-        self.assertEqual(complete_data['user']['email'], test_email)
-
-        # 5. Check session (/api/auth/me)
+        # 2. Check active session (/api/auth/me)
         me_res = self.app.get('/api/auth/me')
         self.assertEqual(me_res.status_code, 200)
         me_data = json.loads(me_res.data)
         self.assertEqual(me_data['user']['email'], test_email)
 
-        # 6. Logout
+        # 3. Logout
         logout_res = self.app.post('/api/auth/logout')
         self.assertEqual(logout_res.status_code, 200)
 
-    def test_diagnostic_test_endpoints(self):
-        """Verify POST /api/auth/test-email and POST /api/auth/test-sms endpoints."""
-        email_res = self.app.post('/api/auth/test-email', json={"email": "diag_test@pharmora.health"})
-        self.assertEqual(email_res.status_code, 200)
-        e_data = json.loads(email_res.data)
-        self.assertIn("provider", e_data)
+        # 4. Check session after logout
+        me_after_logout = self.app.get('/api/auth/me')
+        self.assertEqual(me_after_logout.status_code, 401)
 
-        sms_res = self.app.post('/api/auth/test-sms', json={"phone": "+919876543210"})
-        self.assertEqual(sms_res.status_code, 200)
-        s_data = json.loads(sms_res.data)
-        self.assertIn("provider", s_data)
+    def test_registration_duplicate_prevention(self):
+        """Verify duplicate email or phone cannot be re-registered."""
+        # First register an account
+        self.app.post('/api/auth/register', json={
+            "name": "Dr. First User",
+            "email": "unique_owner@test.com",
+            "phone": "+919811223344",
+            "password": "owner123Password",
+            "store_name": "Unique Pharmacy",
+            "role": "owner"
+        })
+
+        # Try to register duplicate email
+        res = self.app.post('/api/auth/register', json={
+            "name": "Dr. Duplicate",
+            "email": "unique_owner@test.com",
+            "phone": "+919999988888",
+            "password": "password123",
+            "store_name": "Dup Pharmacy",
+            "role": "owner"
+        })
+        self.assertEqual(res.status_code, 400)
+        data = json.loads(res.data)
+        self.assertFalse(data.get("success"))
 
     def test_login_flow(self):
         """Test authentication via registered email and phone number."""
-        # 1. Login with demo owner email
+        test_email = "registered_owner@test.com"
+        test_phone = "+919811223344"
+        test_pass = "owner123"
+
+        # Register user first
+        self.app.post('/api/auth/register', json={
+            "name": "Dr. Sarah",
+            "email": test_email,
+            "phone": test_phone,
+            "password": test_pass,
+            "store_name": "HealthCare Central",
+            "role": "owner"
+        })
+
+        # 1. Login with registered email
         login_res = self.app.post('/api/auth/login', json={
-            "identifier": "owner@pharma.com",
-            "password": "owner123"
+            "identifier": test_email,
+            "password": test_pass
         })
         self.assertEqual(login_res.status_code, 200)
         data = json.loads(login_res.data)
@@ -160,48 +129,56 @@ class PharmoraAuthTestCase(unittest.TestCase):
         # 2. Login with phone number
         phone_login_res = self.app.post('/api/auth/login', json={
             "identifier": "9811223344",
-            "password": "owner123"
+            "password": test_pass
         })
         self.assertEqual(phone_login_res.status_code, 200)
 
         # 3. Login with incorrect password -> Expect 401
         bad_login = self.app.post('/api/auth/login', json={
-            "identifier": "owner@pharma.com",
+            "identifier": test_email,
             "password": "wrongpassword"
         })
         self.assertEqual(bad_login.status_code, 401)
 
-    def test_resend_channel_cooldown(self):
-        """Verify 60-second resend cooldown for specific channel."""
-        email = "cooldown_test_channel@pharmora.health"
-        phone = "+919876500077"
+    def test_landing_page_accessible_and_logout(self):
+        """Verify that landing page is publicly accessible and logout clears session."""
+        test_email = "landing_test@test.com"
+        test_pass = "pass1234"
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE email = ? OR phone = ?", (email, phone))
-        cursor.execute("DELETE FROM otp_verifications WHERE email = ? OR phone = ?", (email, phone))
-        cursor.execute("DELETE FROM rate_limits")
-        conn.commit()
-        conn.close()
-
-        # Send initial OTP
-        res1 = self.app.post('/api/auth/register', json={
-            "name": "Dr. Cooldown Test",
-            "email": email,
-            "phone": phone,
-            "password": "Password123",
-            "store_name": "Cooldown Pharmacy",
+        # Register and login
+        self.app.post('/api/auth/register', json={
+            "name": "Dr. Landing",
+            "email": test_email,
+            "phone": "+919811009988",
+            "password": test_pass,
+            "store_name": "Landing Pharmacy",
             "role": "owner"
         })
-        self.assertEqual(res1.status_code, 200)
 
-        # Immediately attempt channel resend -> Expect 429 rate limit
-        resend_res = self.app.post('/api/auth/resend-channel-otp', json={
-            "email": email,
-            "phone": phone,
-            "channel": "email"
-        })
-        self.assertEqual(resend_res.status_code, 429)
+        # 1. Check that active session exists
+        me_res = self.app.get('/api/auth/me')
+        self.assertEqual(me_res.status_code, 200)
+        self.assertTrue(json.loads(me_res.data).get("success"))
+
+        # 2. Visit landing page (/) - should succeed
+        home_res = self.app.get('/')
+        self.assertEqual(home_res.status_code, 200)
+        self.assertIn(b"PHARMORA", home_res.data)
+
+        # 3. Explicit logout
+        logout_res = self.app.post('/api/auth/logout')
+        self.assertEqual(logout_res.status_code, 200)
+
+        # 4. Verify that session is now cleared
+        me_after_logout = self.app.get('/api/auth/me')
+        self.assertEqual(me_after_logout.status_code, 401)
+        self.assertFalse(json.loads(me_after_logout.data).get("success"))
+
+    def test_unauthenticated_dashboard_redirects(self):
+        """Verify that accessing protected dashboard without login redirects to /login."""
+        dash_res = self.app.get('/dashboard', follow_redirects=False)
+        self.assertEqual(dash_res.status_code, 302)
+        self.assertIn('/login', dash_res.headers.get('Location', ''))
 
 if __name__ == '__main__':
     unittest.main()
