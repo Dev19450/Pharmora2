@@ -416,7 +416,25 @@ def compute_product_analytics(df: pd.DataFrame) -> dict:
 def compute_stock_and_expiry_dashboard(df: pd.DataFrame) -> dict:
     """Stock levels, Low Stock, Out of Stock, Overstock, Expiry tracking, Red Alert."""
     if df.empty:
-        return {"summary": {}, "low_stock": [], "out_of_stock": [], "overstock": [], "expiring_30": [], "expiring_60": [], "expiring_90": [], "red_alert": []}
+        return {
+            "summary": {
+                "total_inventory_items": 0,
+                "low_stock_count": 0,
+                "out_of_stock_count": 0,
+                "overstock_count": 0,
+                "expiring_30_count": 0,
+                "expiring_60_count": 0,
+                "expiring_90_count": 0,
+                "red_alert_count": 0
+            },
+            "low_stock": [],
+            "out_of_stock": [],
+            "overstock": [],
+            "expiring_30": [],
+            "expiring_60": [],
+            "expiring_90": [],
+            "red_alert": []
+        }
 
     med_summary = (
         df.groupby("Medicine")

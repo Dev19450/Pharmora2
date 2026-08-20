@@ -26,14 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==============================================================================
-   Production-Ready Authentication, Confirmation Step & Dual 6-Box OTP System
+   Direct Authentication & Registration (No OTP)
    ============================================================================== */
-
-let resendEmailTimerInterval = null;
-let resendPhoneTimerInterval = null;
-let otpExpiryTimerInterval = null;
-let pendingRegistrationData = null;
-let verificationState = { emailVerified: false, phoneVerified: false };
 
 function initAuth() {
     const authOverlay = document.getElementById('auth-modal-overlay');
@@ -43,46 +37,8 @@ function initAuth() {
     const formSignup = document.getElementById('form-signup');
     const btnLogout = document.getElementById('btn-logout');
 
-    // Multi-Step Containers
-    const step1 = document.getElementById('signup-step1');
-    const stepConfirm = document.getElementById('signup-step-confirm');
-    const stepOtp = document.getElementById('otp-step-container');
-    const stepSuccess = document.getElementById('signup-step-success');
-
-    // Step 1 Controls
-    const btnGotoConfirm = document.getElementById('btn-goto-confirm');
-    const signupErrorAlert = document.getElementById('signup-error-alert');
-
-    // Step 1.5 Confirmation Controls
-    const chkConfirmEmail = document.getElementById('chk-confirm-email');
-    const chkConfirmPhone = document.getElementById('chk-confirm-phone');
-    const chkConfirmAccess = document.getElementById('chk-confirm-access');
-    const btnBackToStep1 = document.getElementById('btn-back-to-step1');
-    const btnRequestDualOtp = document.getElementById('btn-request-dual-otp');
-    const confirmErrorAlert = document.getElementById('confirm-error-alert');
-
-    // Step 2 OTP Verification Controls
-    const badgeEmailDelivery = document.getElementById('badge-email-delivery');
-    const badgePhoneDelivery = document.getElementById('badge-phone-delivery');
-    const emailBoxes = document.querySelectorAll('.otp-box-email');
-    const phoneBoxes = document.querySelectorAll('.otp-box-phone');
-    const btnResendEmail = document.getElementById('btn-resend-email-otp');
-    const btnResendPhone = document.getElementById('btn-resend-phone-otp');
-    const resendEmailText = document.getElementById('resend-email-text');
-    const resendPhoneText = document.getElementById('resend-phone-text');
-    const alertEmailOtp = document.getElementById('alert-email-otp');
-    const alertPhoneOtp = document.getElementById('alert-phone-otp');
-    const statusEmailTag = document.getElementById('status-email-tag');
-    const statusPhoneTag = document.getElementById('status-phone-tag');
-    const btnVerifyDualOtp = document.getElementById('btn-verify-dual-otp');
-    const otpGlobalError = document.getElementById('otp-global-error-alert');
-    const btnBackSignup = document.getElementById('btn-back-signup');
-    const otpExpiryCountdown = document.getElementById('otp-expiry-countdown');
-
-    // Step 3 Success Controls
-    const btnContinueDashboard = document.getElementById('btn-continue-dashboard');
-
     const loginErrorAlert = document.getElementById('login-error-alert');
+    const signupErrorAlert = document.getElementById('signup-error-alert');
 
     // 1. Tab Switching (Login <-> Create Account)
     if (tabLogin && tabSignup) {
@@ -91,8 +47,6 @@ function initAuth() {
             tabSignup.classList.remove('active');
             formLogin.style.display = 'block';
             formSignup.style.display = 'none';
-            formSignup.reset();
-            resetSignupWizard();
             if (loginErrorAlert) loginErrorAlert.style.display = 'none';
             if (signupErrorAlert) signupErrorAlert.style.display = 'none';
         });
@@ -102,8 +56,6 @@ function initAuth() {
             tabLogin.classList.remove('active');
             formSignup.style.display = 'block';
             formLogin.style.display = 'none';
-            formLogin.reset();
-            resetSignupWizard();
             if (loginErrorAlert) loginErrorAlert.style.display = 'none';
             if (signupErrorAlert) signupErrorAlert.style.display = 'none';
         });
@@ -118,17 +70,7 @@ function initAuth() {
         }
     }
 
-    // 2. Demo Quick Sign-in Buttons
-    document.querySelectorAll('.demo-login-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (tabLogin) tabLogin.click();
-            document.getElementById('login-email').value = btn.getAttribute('data-email');
-            document.getElementById('login-password').value = btn.getAttribute('data-pass');
-            formLogin.dispatchEvent(new Event('submit'));
-        });
-    });
-
-    // 3. Login Submission Handler
+    // 2. Login Submission Handler
     if (formLogin) {
         formLogin.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -155,29 +97,17 @@ function initAuth() {
                     return;
                 }
 
-                currentUser = data.user;
-                applyUserRole(currentUser);
-                if (authOverlay) authOverlay.style.display = 'none';
-                loadDashboardData();
-                fetchInvoiceHistory();
-                fetchStockLogs();
-
-                // If URL specified a tab, activate it
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetTab = urlParams.get('tab');
-                if (targetTab) {
-                    const navItem = document.querySelector(`.nav-item[data-tab="${targetTab}"]`);
-                    if (navItem) navItem.click();
-                }
+                handleAuthSuccess(data.user);
             } catch (err) {
                 showError(loginErrorAlert, "Server connection failed. Please check network.");
             }
         });
     }
 
-    // 4. STEP 1: Proceed to Contact Confirmation Step
-    if (btnGotoConfirm) {
-        btnGotoConfirm.addEventListener('click', () => {
+    // 3. Direct Signup Submission Handler
+    if (formSignup) {
+        formSignup.addEventListener('submit', async (e) => {
+            e.preventDefault();
             if (signupErrorAlert) signupErrorAlert.style.display = 'none';
 
             const name = document.getElementById('signup-name').value.trim();
@@ -188,495 +118,52 @@ function initAuth() {
             const role = document.getElementById('signup-role').value;
 
             if (!name || !email || !phone || !password || !store_name) {
-                showError(signupErrorAlert, "Please fill in all required registration fields.");
+                showError(signupErrorAlert, "Please fill in all registration fields.");
                 return;
             }
 
-            const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-            if (!emailRegex.test(email)) {
-                showError(signupErrorAlert, "Please enter a valid Email Address (e.g. sarah@pharmacy.com).");
-                return;
+            const btnSubmit = document.getElementById('btn-submit-signup');
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...`;
             }
-
-            const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-            if (cleanPhone.length < 10) {
-                showError(signupErrorAlert, "Please enter a valid 10-15 digit Mobile Phone Number.");
-                return;
-            }
-
-            pendingRegistrationData = { name, email, phone: cleanPhone, password, store_name, role };
-
-            // Update confirmation details
-            document.getElementById('confirm-display-email').innerText = email;
-            document.getElementById('confirm-display-phone').innerText = cleanPhone.startsWith('+') ? cleanPhone : `+91 ${cleanPhone}`;
-
-            chkConfirmEmail.checked = false;
-            chkConfirmPhone.checked = false;
-            chkConfirmAccess.checked = false;
-            if (confirmErrorAlert) confirmErrorAlert.style.display = 'none';
-
-            step1.style.display = 'none';
-            stepConfirm.style.display = 'block';
-        });
-    }
-
-    // Return to Step 1
-    if (btnBackToStep1) {
-        btnBackToStep1.addEventListener('click', () => {
-            chkConfirmEmail.checked = false;
-            chkConfirmPhone.checked = false;
-            chkConfirmAccess.checked = false;
-            if (confirmErrorAlert) confirmErrorAlert.style.display = 'none';
-            stepConfirm.style.display = 'none';
-            step1.style.display = 'block';
-        });
-    }
-
-    // 5. STEP 1.5: Send Dual Verification Codes
-    if (btnRequestDualOtp) {
-        btnRequestDualOtp.addEventListener('click', async () => {
-            if (confirmErrorAlert) confirmErrorAlert.style.display = 'none';
-
-            if (!chkConfirmEmail.checked) {
-                showError(confirmErrorAlert, "Please confirm that the Email Address belongs to you.");
-                return;
-            }
-            if (!chkConfirmPhone.checked) {
-                showError(confirmErrorAlert, "Please confirm that the Mobile Phone Number belongs to you.");
-                return;
-            }
-            if (!chkConfirmAccess.checked) {
-                showError(confirmErrorAlert, "Please confirm that you have active access to both channels.");
-                return;
-            }
-
-            btnRequestDualOtp.disabled = true;
-            btnRequestDualOtp.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispathing Codes...`;
 
             try {
                 const res = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ...pendingRegistrationData, purpose: 'registration' })
+                    body: JSON.stringify({ name, email, phone, password, store_name, role })
                 });
                 const data = await res.json();
 
-                btnRequestDualOtp.disabled = false;
-                btnRequestDualOtp.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Send Verification Codes`;
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i class="fa-solid fa-user-plus" style="margin-right:8px;"></i> Create Account`;
+                }
 
                 if (!data.success || data.error) {
-                    showError(confirmErrorAlert, data.error || "Failed to initiate verification.");
+                    showError(signupErrorAlert, data.error || "Registration failed. Please try again.");
                     return;
                 }
 
-                // Transition to Step 2 OTP Screen
-                stepConfirm.style.display = 'none';
-                stepOtp.style.display = 'block';
-
-                document.getElementById('otp-display-email').innerText = data.target_email || pendingRegistrationData.email;
-                document.getElementById('otp-display-phone').innerText = data.target_phone || pendingRegistrationData.phone;
-
-                // Update Real Provider Delivery Badges
-                updateDeliveryBadge(badgeEmailDelivery, data.email);
-                updateDeliveryBadge(badgePhoneDelivery, data.mobile);
-
-                // Reset verification state
-                verificationState = { emailVerified: false, phoneVerified: false };
-                updateChannelStatusUI();
-
-                clearBoxes(emailBoxes);
-                clearBoxes(phoneBoxes);
-                if (emailBoxes[0]) emailBoxes[0].focus();
-
-                startResendTimer('email', data.cooldown_seconds || 60);
-                startResendTimer('phone', data.cooldown_seconds || 60);
-                startExpiryTimer(data.expires_in_minutes || 5);
-
+                handleAuthSuccess(data.user);
             } catch (err) {
-                btnRequestDualOtp.disabled = false;
-                btnRequestDualOtp.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Send Verification Codes`;
-                showError(confirmErrorAlert, "Failed to connect to verification server.");
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i class="fa-solid fa-user-plus" style="margin-right:8px;"></i> Create Account`;
+                }
+                showError(signupErrorAlert, "Server connection failed. Please check network.");
             }
         });
     }
 
-    function updateDeliveryBadge(elem, channelData) {
-        if (!elem || !channelData) return;
-        if (channelData.providerAccepted) {
-            elem.className = "badge badge-success";
-            elem.innerHTML = `<i class="fa-solid fa-circle-check"></i> Code sent (${channelData.provider})`;
-        } else {
-            elem.className = "badge badge-danger";
-            elem.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Provider failed (${channelData.provider})`;
-        }
-    }
-
-    // 6. Setup 6-Box Numeric Input Navigation for a given box group
-    function setupBoxGroup(boxes, onAllFilled, channelType) {
-        boxes.forEach((box, index) => {
-            box.addEventListener('input', (e) => {
-                const val = box.value.replace(/[^0-9]/g, '');
-                box.value = val.slice(0, 1);
-
-                if (box.value) {
-                    box.classList.add('filled');
-                    if (index < boxes.length - 1) {
-                        boxes[index + 1].focus();
-                    } else {
-                        const code = getBoxCode(boxes);
-                        if (code.length === 6 && onAllFilled) {
-                            onAllFilled(code);
-                        }
-                    }
-                } else {
-                    box.classList.remove('filled');
-                }
-            });
-
-            box.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace') {
-                    if (!box.value && index > 0) {
-                        boxes[index - 1].focus();
-                        boxes[index - 1].value = '';
-                        boxes[index - 1].classList.remove('filled');
-                    } else {
-                        box.value = '';
-                        box.classList.remove('filled');
-                    }
-                } else if (e.key === 'ArrowLeft' && index > 0) {
-                    boxes[index - 1].focus();
-                } else if (e.key === 'ArrowRight' && index < boxes.length - 1) {
-                    boxes[index + 1].focus();
-                }
-            });
-
-            box.addEventListener('paste', (e) => {
-                e.preventDefault();
-                const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/[^0-9]/g, '');
-                if (!pasteData) return;
-
-                for (let i = 0; i < boxes.length; i++) {
-                    if (i < pasteData.length) {
-                        boxes[i].value = pasteData[i];
-                        boxes[i].classList.add('filled');
-                    } else {
-                        boxes[i].value = '';
-                        boxes[i].classList.remove('filled');
-                    }
-                }
-
-                const nextIndex = Math.min(pasteData.length, 5);
-                boxes[nextIndex].focus();
-
-                const fullCode = getBoxCode(boxes);
-                if (fullCode.length === 6 && onAllFilled) {
-                    onAllFilled(fullCode);
-                }
-            });
-        });
-    }
-
-    function getBoxCode(boxes) {
-        let code = '';
-        boxes.forEach(b => { code += b.value.trim(); });
-        return code;
-    }
-
-    function clearBoxes(boxes) {
-        boxes.forEach(b => {
-            b.value = '';
-            b.classList.remove('filled');
-            b.disabled = false;
-        });
-    }
-
-    function lockBoxes(boxes) {
-        boxes.forEach(b => {
-            b.disabled = true;
-        });
-    }
-
-    // Auto-verify when 6 digits of Email OTP are typed
-    setupBoxGroup(emailBoxes, async (code) => {
-        if (verificationState.emailVerified) return;
-        if (alertEmailOtp) alertEmailOtp.innerText = "Verifying email code...";
-
-        try {
-            const res = await fetch('/api/auth/verify-email-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingRegistrationData.email, otp_code: code })
-            });
-            const data = await res.json();
-
-            if (data.success && data.email_verified) {
-                verificationState.emailVerified = true;
-                if (alertEmailOtp) alertEmailOtp.innerText = "";
-                lockBoxes(emailBoxes);
-                updateChannelStatusUI();
-                if (!verificationState.phoneVerified && phoneBoxes[0]) {
-                    phoneBoxes[0].focus();
-                }
-                checkIfFullyVerified();
-            } else {
-                if (alertEmailOtp) alertEmailOtp.innerText = data.error || "Incorrect email code.";
-            }
-        } catch (err) {
-            if (alertEmailOtp) alertEmailOtp.innerText = "Verification failed. Check network.";
-        }
-    }, 'email');
-
-    // Auto-verify when 6 digits of Mobile OTP are typed
-    setupBoxGroup(phoneBoxes, async (code) => {
-        if (verificationState.phoneVerified) return;
-        if (alertPhoneOtp) alertPhoneOtp.innerText = "Verifying mobile code...";
-
-        try {
-            const res = await fetch('/api/auth/verify-phone-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: pendingRegistrationData.phone, otp_code: code })
-            });
-            const data = await res.json();
-
-            if (data.success && data.phone_verified) {
-                verificationState.phoneVerified = true;
-                if (alertPhoneOtp) alertPhoneOtp.innerText = "";
-                lockBoxes(phoneBoxes);
-                updateChannelStatusUI();
-                checkIfFullyVerified();
-            } else {
-                if (alertPhoneOtp) alertPhoneOtp.innerText = data.error || "Incorrect mobile code.";
-            }
-        } catch (err) {
-            if (alertPhoneOtp) alertPhoneOtp.innerText = "Verification failed. Check network.";
-        }
-    }, 'phone');
-
-    function updateChannelStatusUI() {
-        if (statusEmailTag) {
-            if (verificationState.emailVerified) {
-                statusEmailTag.style.color = "var(--palette-lime)";
-                statusEmailTag.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verified`;
-            } else {
-                statusEmailTag.style.color = "var(--text-muted)";
-                statusEmailTag.innerText = "Pending";
-            }
-        }
-
-        if (statusPhoneTag) {
-            if (verificationState.phoneVerified) {
-                statusPhoneTag.style.color = "var(--palette-lime)";
-                statusPhoneTag.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verified`;
-            } else {
-                statusPhoneTag.style.color = "var(--text-muted)";
-                statusPhoneTag.innerText = "Pending";
-            }
-        }
-    }
-
-    // 7. Verify Both / Primary Button
-    if (btnVerifyDualOtp) {
-        btnVerifyDualOtp.addEventListener('click', async () => {
-            if (otpGlobalError) otpGlobalError.style.display = 'none';
-
-            const emailCode = getBoxCode(emailBoxes);
-            const phoneCode = getBoxCode(phoneBoxes);
-
-            if (!verificationState.emailVerified && emailCode.length !== 6) {
-                showError(otpGlobalError, "Please enter all 6 digits of the Email verification code.");
-                return;
-            }
-
-            if (!verificationState.phoneVerified && phoneCode.length !== 6) {
-                showError(otpGlobalError, "Please enter all 6 digits of the Mobile verification code.");
-                return;
-            }
-
-            btnVerifyDualOtp.disabled = true;
-            btnVerifyDualOtp.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying Account...`;
-
-            try {
-                const res = await fetch('/api/auth/verify-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...pendingRegistrationData,
-                        email_otp: emailCode,
-                        phone_otp: phoneCode,
-                        purpose: 'registration'
-                    })
-                });
-                const data = await res.json();
-
-                btnVerifyDualOtp.disabled = false;
-                btnVerifyDualOtp.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verify Email & Mobile`;
-
-                if (!data.success || data.error) {
-                    showError(otpGlobalError, data.error || "Verification failed.");
-                    return;
-                }
-
-                if (data.email_verified) {
-                    verificationState.emailVerified = true;
-                    lockBoxes(emailBoxes);
-                }
-                if (data.phone_verified) {
-                    verificationState.phoneVerified = true;
-                    lockBoxes(phoneBoxes);
-                }
-                updateChannelStatusUI();
-
-                if (data.fully_verified && data.user) {
-                    currentUser = data.user;
-                    applyUserRole(currentUser);
-                    showSuccessScreen();
-                } else {
-                    showError(otpGlobalError, data.message || "Please verify the remaining channel.");
-                }
-            } catch (err) {
-                btnVerifyDualOtp.disabled = false;
-                btnVerifyDualOtp.innerHTML = `<i class="fa-solid fa-circle-check"></i> Verify Email & Mobile`;
-                showError(otpGlobalError, "Verification failed. Check network connection.");
-            }
-        });
-    }
-
-    async function checkIfFullyVerified() {
-        if (verificationState.emailVerified && verificationState.phoneVerified) {
-            // Trigger completion
-            if (btnVerifyDualOtp) btnVerifyDualOtp.click();
-        }
-    }
-
-    function showSuccessScreen() {
-        clearInterval(resendEmailTimerInterval);
-        clearInterval(resendPhoneTimerInterval);
-        clearInterval(otpExpiryTimerInterval);
-
-        document.getElementById('success-email-val').innerText = pendingRegistrationData.email;
-        document.getElementById('success-phone-val').innerText = pendingRegistrationData.phone;
-
-        stepOtp.style.display = 'none';
-        stepSuccess.style.display = 'block';
-    }
-
-    // Continue to Dashboard
-    if (btnContinueDashboard) {
-        btnContinueDashboard.addEventListener('click', () => {
-            if (authOverlay) authOverlay.style.display = 'none';
-            loadDashboardData();
-            fetchInvoiceHistory();
-            fetchStockLogs();
-        });
-    }
-
-    // 8. Resend Email Code Handler
-    if (btnResendEmail) {
-        btnResendEmail.addEventListener('click', async () => {
-            if (!pendingRegistrationData || verificationState.emailVerified) return;
-            btnResendEmail.disabled = true;
-            resendEmailText.innerText = "Sending...";
-
-            try {
-                const res = await fetch('/api/auth/resend-channel-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: pendingRegistrationData.email, channel: 'email' })
-                });
-                const data = await res.json();
-
-                if (!data.success || data.error) {
-                    if (alertEmailOtp) alertEmailOtp.innerText = data.error || "Unable to resend email code.";
-                    btnResendEmail.disabled = false;
-                    resendEmailText.innerText = "Resend Email Code";
-                    return;
-                }
-
-                clearBoxes(emailBoxes);
-                if (emailBoxes[0]) emailBoxes[0].focus();
-                startResendTimer('email', data.cooldown_seconds || 60);
-                if (data.delivery && data.delivery.email) {
-                    updateDeliveryBadge(badgeEmailDelivery, data.delivery.email);
-                }
-                if (alertEmailOtp) alertEmailOtp.innerText = "";
-            } catch (err) {
-                btnResendEmail.disabled = false;
-                resendEmailText.innerText = "Resend Email Code";
-                if (alertEmailOtp) alertEmailOtp.innerText = "Failed to resend.";
-            }
-        });
-    }
-
-    // 9. Resend Mobile Code Handler
-    if (btnResendPhone) {
-        btnResendPhone.addEventListener('click', async () => {
-            if (!pendingRegistrationData || verificationState.phoneVerified) return;
-            btnResendPhone.disabled = true;
-            resendPhoneText.innerText = "Sending...";
-
-            try {
-                const res = await fetch('/api/auth/resend-channel-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: pendingRegistrationData.phone, channel: 'phone' })
-                });
-                const data = await res.json();
-
-                if (!data.success || data.error) {
-                    if (alertPhoneOtp) alertPhoneOtp.innerText = data.error || "Unable to resend mobile code.";
-                    btnResendPhone.disabled = false;
-                    resendPhoneText.innerText = "Resend Mobile Code";
-                    return;
-                }
-
-                clearBoxes(phoneBoxes);
-                if (phoneBoxes[0]) phoneBoxes[0].focus();
-                startResendTimer('phone', data.cooldown_seconds || 60);
-                if (data.delivery && data.delivery.mobile) {
-                    updateDeliveryBadge(badgePhoneDelivery, data.delivery.mobile);
-                }
-                if (alertPhoneOtp) alertPhoneOtp.innerText = "";
-            } catch (err) {
-                btnResendPhone.disabled = false;
-                resendPhoneText.innerText = "Resend Mobile Code";
-                if (alertPhoneOtp) alertPhoneOtp.innerText = "Failed to resend.";
-            }
-        });
-    }
-
-    // 10. Change Email / Mobile -> Return to Step 1
-    if (btnBackSignup) {
-        btnBackSignup.addEventListener('click', () => {
-            clearInterval(resendEmailTimerInterval);
-            clearInterval(resendPhoneTimerInterval);
-            clearInterval(otpExpiryTimerInterval);
-            stepOtp.style.display = 'none';
-            step1.style.display = 'block';
-        });
-    }
-
-    // 11. Sign Out Button
+    // 4. Sign Out Button
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
             await fetch('/api/auth/logout', { method: 'POST' });
             currentUser = null;
-            clearInterval(resendEmailTimerInterval);
-            clearInterval(resendPhoneTimerInterval);
-            clearInterval(otpExpiryTimerInterval);
             window.location.href = '/';
         });
-    }
-
-    function resetSignupWizard() {
-        clearInterval(resendEmailTimerInterval);
-        clearInterval(resendPhoneTimerInterval);
-        clearInterval(otpExpiryTimerInterval);
-        step1.style.display = 'block';
-        stepConfirm.style.display = 'none';
-        stepOtp.style.display = 'none';
-        stepSuccess.style.display = 'none';
-        if (signupErrorAlert) signupErrorAlert.style.display = 'none';
     }
 
     function showError(elem, msg) {
@@ -685,68 +172,35 @@ function initAuth() {
         elem.style.color = 'var(--accent-rose)';
         elem.innerText = msg;
     }
+}
 
-    function startResendTimer(channel, seconds) {
-        let remaining = seconds;
-        if (channel === 'email') {
-            clearInterval(resendEmailTimerInterval);
-            btnResendEmail.disabled = true;
-            resendEmailText.innerText = `Resend in ${remaining}s`;
+function handleAuthSuccess(user) {
+    currentUser = user;
+    applyUserRole(currentUser);
+    const authOverlay = document.getElementById('auth-modal-overlay');
+    if (authOverlay) authOverlay.style.display = 'none';
 
-            resendEmailTimerInterval = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) {
-                    clearInterval(resendEmailTimerInterval);
-                    btnResendEmail.disabled = false;
-                    resendEmailText.innerText = "Resend Email Code";
-                } else {
-                    resendEmailText.innerText = `Resend in ${remaining}s`;
-                }
-            }, 1000);
-        } else {
-            clearInterval(resendPhoneTimerInterval);
-            btnResendPhone.disabled = true;
-            resendPhoneText.innerText = `Resend in ${remaining}s`;
+    loadDashboardData();
+    fetchInvoiceHistory();
+    fetchStockLogs();
 
-            resendPhoneTimerInterval = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) {
-                    clearInterval(resendPhoneTimerInterval);
-                    btnResendPhone.disabled = false;
-                    resendPhoneText.innerText = "Resend Mobile Code";
-                } else {
-                    resendPhoneText.innerText = `Resend in ${remaining}s`;
-                }
-            }, 1000);
-        }
+    // Directly open Dashboard tab (or tab specified in URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetTab = urlParams.get('tab') || 'tab-dashboard';
+    const navItem = document.querySelector(`.nav-item[data-tab="${targetTab}"]`);
+    if (navItem) {
+        navItem.click();
+    } else {
+        const dashNav = document.querySelector('.nav-item[data-tab="tab-dashboard"]');
+        if (dashNav) dashNav.click();
     }
 
-    function startExpiryTimer(minutes) {
-        clearInterval(otpExpiryTimerInterval);
-        let totalSeconds = minutes * 60;
-
-        function updateDisplay() {
-            const m = Math.floor(totalSeconds / 60);
-            const s = totalSeconds % 60;
-            if (otpExpiryCountdown) {
-                otpExpiryCountdown.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }
-        }
-
-        updateDisplay();
-        otpExpiryTimerInterval = setInterval(() => {
-            totalSeconds--;
-            if (totalSeconds <= 0) {
-                clearInterval(otpExpiryTimerInterval);
-                if (otpExpiryCountdown) otpExpiryCountdown.innerText = "Expired (00:00)";
-                if (otpGlobalError) {
-                    showError(otpGlobalError, "Verification codes have expired. Please request new codes.");
-                }
-            } else {
-                updateDisplay();
-            }
-        }, 1000);
-    }
+    // Force redraw / resize charts to render immediately
+    setTimeout(() => {
+        Object.values(chartInstances).forEach(chart => {
+            if (chart && typeof chart.resize === 'function') chart.resize();
+        });
+    }, 100);
 }
 
 async function checkSession() {
@@ -755,12 +209,7 @@ async function checkSession() {
         const res = await fetch('/api/auth/me');
         const data = await res.json();
         if (data.user) {
-            currentUser = data.user;
-            applyUserRole(currentUser);
-            if (authOverlay) authOverlay.style.display = 'none';
-            loadDashboardData();
-            fetchInvoiceHistory();
-            fetchStockLogs();
+            handleAuthSuccess(data.user);
         } else {
             // Unauthenticated: Keep Auth Modal Overlay visible and block dashboard
             if (authOverlay) authOverlay.style.display = 'flex';
@@ -1053,7 +502,13 @@ function updateStockAddPreview() {
 
 function populateAddStockMedSelector(meds) {
     const medSelect = document.getElementById('stock-add-med-select');
-    if (!medSelect || !meds) return;
+    if (!medSelect) return;
+
+    if (!meds || meds.length === 0) {
+        medSelect.innerHTML = '<option value="">-- No existing medicines (Use New Medicine mode below) --</option>';
+        updateStockAddPreview();
+        return;
+    }
 
     const currentVal = medSelect.value;
     medSelect.innerHTML = '<option value="">-- Select Medicine to Add Stock --</option>' +
@@ -1441,13 +896,51 @@ function renderInvoiceModal(inv) {
 
 function populatePOSMedSelector(meds) {
     const medSelect = document.getElementById('pos-med-select');
-    if (!medSelect || !meds) return;
+    if (!medSelect) return;
+
+    if (!meds || meds.length === 0) {
+        medSelect.innerHTML = '<option value="">-- No medicines in inventory (Upload CSV or Add Stock) --</option>';
+        return;
+    }
 
     const currentVal = medSelect.value;
     medSelect.innerHTML = '<option value="">-- Choose Medicine --</option>' +
         meds.map(m => `<option value="${m.medicine}">${m.medicine} (Stock: ${m.stock} strips)</option>`).join('');
     
     if (currentVal) medSelect.value = currentVal;
+}
+
+async function resetUserDataset() {
+    if (!confirm("Are you sure you want to reset your workspace to a clean slate? This will clear active sales records and reset charts to 0.")) {
+        return;
+    }
+    try {
+        const res = await fetch('/api/dataset/reset', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message || "Workspace reset to clean slate.");
+            loadDashboardData();
+            fetchInvoiceHistory();
+            fetchStockLogs();
+        }
+    } catch (err) {
+        alert("Failed to reset dataset.");
+    }
+}
+
+async function loadSampleDataset() {
+    try {
+        const res = await fetch('/api/dataset/load-sample', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message || "Sample dataset loaded!");
+            loadDashboardData();
+            fetchInvoiceHistory();
+            fetchStockLogs();
+        }
+    } catch (err) {
+        alert("Failed to load sample dataset.");
+    }
 }
 
 function debounce(func, wait) {

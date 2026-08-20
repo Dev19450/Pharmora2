@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2026-08-19 09:21:27",
+    "medicine": "User A Special Medicine",
+    "category": "Antibiotic",
+    "company": "Pharma A",
+    "mode": "New Medicine Added",
+    "previous_stock": 0,
+    "added_qty": 50,
+    "new_stock": 50,
+    "user": "Dr. User A"
+  }
+]

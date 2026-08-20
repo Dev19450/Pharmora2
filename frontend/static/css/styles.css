@@ -1408,11 +1408,6 @@ a {
     font-size: 1.4rem !important;
   }
 
-  .demo-login-btn {
-    flex: 1;
-    min-width: 70px;
-  }
-
   /* Chatbot Drawer Mobile Dock */
   .chatbot-trigger {
     bottom: 1.25rem;
