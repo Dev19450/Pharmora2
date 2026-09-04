@@ -249,10 +249,11 @@
           <div class="preview-image-wrapper">
             <a href="/dashboard" title="Click to view live Pharmora Dashboard" class="preview-image-link">
               <img src="{{ url_for('static', filename='images/dashboard_preview.png') }}" 
+                   data-fallback="{{ url_for('static', filename='images/dashboard_preview_cropped.png') }}"
                    alt="Pharmora Intelligent Pharmacy Dashboard Preview" 
                    class="dashboard-mockup-img"
                    loading="eager"
-                   onerror="this.src='{{ url_for('static', filename='images/dashboard_preview_cropped.png') }}'">
+                   onerror="this.onerror=null; this.src=this.dataset.fallback;">
               <div class="preview-overlay-hover">
                 <span class="overlay-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Dashboard</span>
               </div>
